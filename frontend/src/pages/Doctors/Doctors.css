@@ -1,0 +1,81 @@
+/* Filter Buttons */
+
+.filter-buttons{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:15px;
+    margin:35px 0;
+}
+
+.filter-buttons button{
+    padding:12px 25px;
+    border:none;
+    border-radius:30px;
+    background:#f1f5f9;
+    color:#1e3a8a;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.filter-buttons button:hover{
+    background:#2563eb;
+    color:white;
+}
+
+.filter-buttons .active{
+    background:#2563eb;
+    color:white;
+}
+
+/* ===================== Search Bar ===================== */
+
+.search-container {
+    position: relative;
+    width: 70%;
+    max-width: 700px;
+    margin: 35px auto;
+}
+
+.search-icon {
+    position: absolute;
+    left: 22px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: #2563eb;
+    pointer-events: none;
+}
+
+.search-bar {
+    width: 100%;
+    padding: 16px 20px 16px 55px;
+    font-size: 17px;
+    font-family: "Poppins", sans-serif;
+    border: 2px solid #dbeafe;
+    border-radius: 50px;
+    outline: none;
+    background: #ffffff;
+    color: #1e293b;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.search-bar::placeholder {
+    color: #94a3b8;
+}
+
+.search-bar:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 18px rgba(37,99,235,0.25);
+}
+
+.doctor-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    width: 90%;
+    margin: 40px auto;
+}

@@ -1,0 +1,1649 @@
+
+/* ================================
+   PAGE
+================================ */
+
+.appointments-container {
+    min-height: calc(100vh - 80px);
+
+    background:
+        linear-gradient(
+            180deg,
+            #f7f9fd 0%,
+            #eef3fa 100%
+        );
+
+    padding: 55px 24px 80px;
+
+    box-sizing: border-box;
+}
+
+
+.appointments-wrapper {
+    width: 100%;
+    max-width: 1100px;
+
+    margin: 0 auto;
+}
+
+
+/* ================================
+   HEADING
+================================ */
+
+.appointments-heading {
+    margin-bottom: 35px;
+}
+
+
+.appointments-heading h1 {
+    margin: 0;
+
+    font-size: 38px;
+    font-weight: 750;
+
+    letter-spacing: -0.7px;
+
+    color: #101828;
+}
+
+
+.appointments-heading p {
+    margin: 9px 0 0;
+
+    font-size: 16px;
+
+    color: #667085;
+}
+
+
+/* ================================
+   APPOINTMENT LIST
+================================ */
+
+.appointments-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+
+/* ================================
+   APPOINTMENT CARD
+================================ */
+
+.appointment-card {
+    position: relative;
+
+    background: #ffffff;
+
+    border: 1px solid #e5eaf2;
+
+    border-radius: 18px;
+
+    padding: 26px 28px;
+
+    box-sizing: border-box;
+
+    box-shadow:
+        0 4px 15px rgba(16, 24, 40, 0.04);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.appointment-card:hover {
+    transform: translateY(-2px);
+
+    border-color: #d5def0;
+
+    box-shadow:
+        0 12px 30px rgba(16, 24, 40, 0.08);
+}
+
+
+/* ================================
+   CARD HEADER
+================================ */
+
+.appointment-header {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding-bottom: 20px;
+
+    border-bottom: 1px solid #edf0f5;
+}
+
+
+.appointment-header h2 {
+    margin: 0;
+
+    font-size: 21px;
+
+    font-weight: 700;
+
+    color: #101828;
+}
+
+
+.appointment-header p {
+    margin: 6px 0 0;
+
+    font-size: 14px;
+
+    color: #667085;
+}
+
+
+/* ================================
+   STATUS
+================================ */
+
+.status {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 90px;
+
+    padding: 7px 13px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    text-transform: capitalize;
+
+    letter-spacing: 0.2px;
+
+    white-space: nowrap;
+}
+
+
+/* BOOKED */
+
+.status.booked {
+    background: #eaf2ff;
+
+    color: #2458c6;
+}
+
+
+/* COMPLETED */
+
+.status.completed {
+    background: #e9f8ef;
+
+    color: #18864b;
+}
+
+
+/* CANCELLED */
+
+.status.cancelled {
+    background: #fff0f0;
+
+    color: #d92d20;
+}
+
+
+/* ================================
+   APPOINTMENT DETAILS
+================================ */
+
+.appointment-details {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 18px;
+
+    padding: 23px 0;
+}
+
+
+.appointment-details > div {
+    background: #f8fafc;
+
+    border: 1px solid #eef1f5;
+
+    border-radius: 12px;
+
+    padding: 14px 16px;
+
+    box-sizing: border-box;
+}
+
+
+.appointment-details span {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: #667085;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.4px;
+}
+
+
+.appointment-details strong {
+    display: block;
+
+    font-size: 15px;
+
+    font-weight: 650;
+
+    color: #101828;
+}
+
+
+/* ================================
+   ACTIONS
+================================ */
+
+.appointment-actions {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    padding-top: 5px;
+}
+
+
+.cancel-btn,
+.prescription-btn {
+    border-radius: 10px;
+
+    padding: 11px 17px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/* CANCEL */
+
+.cancel-btn {
+    background: #ffffff;
+
+    border: 1px solid #f04438;
+
+    color: #d92d20;
+}
+
+
+.cancel-btn:hover {
+    background: #fff3f2;
+
+    border-color: #d92d20;
+
+    transform: translateY(-1px);
+}
+
+
+/* PRESCRIPTION */
+
+.prescription-btn {
+    background: #2860df;
+
+    border: 1px solid #2860df;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 4px 10px rgba(40, 96, 223, 0.18);
+}
+
+
+.prescription-btn:hover {
+    background: #1e4fbd;
+
+    border-color: #1e4fbd;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 7px 16px rgba(40, 96, 223, 0.25);
+}
+
+
+/* ================================
+   EMPTY STATE
+================================ */
+
+.no-appointments {
+    background: #ffffff;
+
+    border: 1px solid #e5eaf2;
+
+    border-radius: 20px;
+
+    padding: 70px 30px;
+
+    text-align: center;
+
+    box-shadow:
+        0 8px 25px rgba(16, 24, 40, 0.05);
+}
+
+
+.empty-icon {
+    width: 70px;
+    height: 70px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 18px;
+
+    background: #edf3ff;
+
+    font-size: 32px;
+}
+
+
+.no-appointments h2 {
+    margin: 0;
+
+    font-size: 24px;
+
+    color: #101828;
+}
+
+
+.no-appointments p {
+    margin: 9px 0 25px;
+
+    font-size: 15px;
+
+    color: #667085;
+}
+
+
+.no-appointments button {
+    border: none;
+
+    border-radius: 10px;
+
+    padding: 12px 22px;
+
+    background: #2860df;
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.no-appointments button:hover {
+    background: #1e4fbd;
+
+    transform: translateY(-1px);
+}
+
+
+/* ================================
+   LOADING
+================================ */
+
+.loading {
+    min-height: 55vh;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 17px;
+
+    color: #667085;
+}
+
+
+/* ================================
+   PRESCRIPTION OVERLAY
+================================ */
+
+.prescription-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9999;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(15, 23, 42, 0.48);
+
+    backdrop-filter: blur(4px);
+}
+
+
+/* ================================
+   PRESCRIPTION MODAL
+================================ */
+
+.prescription-modal {
+    width: 100%;
+    max-width: 610px;
+
+    background: #ffffff;
+
+    border-radius: 20px;
+
+    padding: 30px;
+
+    box-sizing: border-box;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.18);
+
+    animation:
+        prescriptionModalIn 0.22s ease;
+}
+
+
+@keyframes prescriptionModalIn {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(15px)
+            scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+/* ================================
+   PRESCRIPTION HEADER
+================================ */
+
+.prescription-modal-header {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding-bottom: 18px;
+
+    margin-bottom: 22px;
+
+    border-bottom: 1px solid #eaecf0;
+}
+
+
+.prescription-modal-header h2 {
+    margin: 0;
+
+    font-size: 24px;
+
+    color: #101828;
+}
+
+
+.prescription-modal-header p {
+    margin: 5px 0 0;
+
+    font-size: 14px;
+
+    color: #667085;
+}
+
+
+.prescription-close-btn {
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #f2f4f7;
+
+    color: #475467;
+
+    font-size: 25px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.2s ease;
+}
+
+
+.prescription-close-btn:hover {
+    background: #e4e7ec;
+
+    color: #101828;
+}
+
+
+/* ================================
+   PRESCRIPTION CONTENT
+================================ */
+
+.prescription-content {
+    background: #f8faff;
+
+    border: 1px solid #dce7ff;
+
+    border-radius: 14px;
+
+    padding: 22px;
+
+    min-height: 150px;
+
+    box-sizing: border-box;
+}
+
+
+.prescription-content p {
+    margin: 0;
+
+    color: #344054;
+
+    font-size: 16px;
+
+    line-height: 1.75;
+
+    white-space: pre-wrap;
+}
+
+
+/* ================================
+   PRESCRIPTION DATE
+================================ */
+
+.prescription-date {
+    margin-top: 18px;
+
+    text-align: right;
+
+    color: #667085;
+
+    font-size: 13px;
+}
+
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 800px) {
+
+    .appointments-container {
+        padding: 35px 16px 60px;
+    }
+
+
+    .appointments-heading h1 {
+        font-size: 30px;
+    }
+
+
+    .appointment-card {
+        padding: 22px 20px;
+    }
+
+
+    .appointment-details {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .appointments-heading {
+        margin-bottom: 25px;
+    }
+
+
+    .appointments-heading h1 {
+        font-size: 27px;
+    }
+
+
+    .appointments-heading p {
+        font-size: 14px;
+    }
+
+
+    .appointment-header {
+        flex-direction: column;
+
+        gap: 12px;
+    }
+
+
+    .status {
+        align-self: flex-start;
+    }
+
+
+    .appointment-actions {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        width: 100%;
+    }
+
+
+    .cancel-btn,
+    .prescription-btn {
+        width: 100%;
+    }
+
+
+    .prescription-modal {
+        padding: 22px;
+
+        border-radius: 16px;
+    }
+
+
+    .prescription-modal-header h2 {
+        font-size: 21px;
+    }
+
+}
+
+
+@media (max-width: 400px) {
+
+    .appointments-container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+
+    .appointment-card {
+        padding: 18px 15px;
+
+        border-radius: 15px;
+    }
+
+
+    .appointment-header h2 {
+        font-size: 19px;
+    }
+
+
+    .appointment-details > div {
+        padding: 12px;
+    }
+
+}
+
+/* =========================
+   PRESCRIPTION MODAL
+========================= */
+
+.prescription-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    z-index: 1000;
+}
+
+.prescription-modal {
+    width: 100%;
+    max-width: 650px;
+    max-height: 85vh;
+
+    background: white;
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.prescription-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    padding: 20px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.prescription-modal-header h2 {
+    margin: 0 0 5px;
+}
+
+.prescription-modal-header p {
+    margin: 0;
+    color: #666;
+}
+
+.prescription-close-btn {
+    border: none;
+    background: transparent;
+
+    font-size: 28px;
+    cursor: pointer;
+
+    line-height: 1;
+}
+
+.prescription-modal-content {
+    padding: 20px;
+
+    max-height: 55vh;
+    overflow-y: auto;
+}
+
+.prescription-info {
+    display: flex;
+    flex-direction: column;
+
+    margin-bottom: 15px;
+}
+
+.prescription-info span {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 3px;
+}
+
+.prescription-info strong {
+    font-size: 15px;
+}
+
+.prescription-divider {
+    height: 1px;
+    background: #e5e7eb;
+
+    margin: 20px 0;
+}
+
+.prescription-modal-content h3 {
+    margin-bottom: 12px;
+}
+
+.prescription-content {
+    background: #f8f9fa;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    padding: 18px;
+
+    white-space: pre-wrap;
+
+    line-height: 1.7;
+}
+
+.prescription-modal-footer {
+    padding: 15px 20px;
+
+    border-top: 1px solid #e5e7eb;
+
+    display: flex;
+    justify-content: flex-end;
+}
+
+.prescription-modal-footer button {
+    padding: 9px 18px;
+
+    border: none;
+    border-radius: 6px;
+
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* =========================
+   UPLOADED PRESCRIPTION
+========================= */
+
+.uploaded-prescription-section {
+    margin-top: 25px;
+}
+
+.uploaded-prescription-section h3 {
+    margin-bottom: 12px;
+}
+
+.view-prescription-file-btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* ==========================================
+   RATING BUTTON
+========================================== */
+
+.rating-btn {
+    background: #f59e0b;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rating-btn:hover {
+    background: #d97706;
+    transform: translateY(-1px);
+}
+
+
+/* ==========================================
+   RATING MODAL OVERLAY
+========================================== */
+
+.rating-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    z-index: 1000;
+}
+
+
+/* ==========================================
+   RATING MODAL
+========================================== */
+
+.rating-modal {
+    width: 100%;
+    max-width: 500px;
+
+    background: white;
+    border-radius: 16px;
+
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+
+    overflow: hidden;
+
+    animation: ratingModalAppear 0.2s ease;
+}
+
+@keyframes ratingModalAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* ==========================================
+   RATING MODAL HEADER
+========================================== */
+
+.rating-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    padding: 24px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.rating-modal-header h2 {
+    margin: 0 0 6px;
+
+    font-size: 22px;
+    color: #111827;
+}
+
+.rating-modal-header p {
+    margin: 0;
+
+    font-size: 14px;
+    color: #6b7280;
+}
+
+
+/* ==========================================
+   CLOSE BUTTON
+========================================== */
+
+.rating-close-btn {
+    width: 34px;
+    height: 34px;
+
+    border: none;
+    background: #f3f4f6;
+
+    border-radius: 50%;
+
+    font-size: 22px;
+    line-height: 1;
+
+    color: #4b5563;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.2s ease;
+}
+
+.rating-close-btn:hover {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+
+/* ==========================================
+   RATING CONTENT
+========================================== */
+
+.rating-modal-content {
+    padding: 30px 24px;
+}
+
+.rating-question {
+    margin: 0 0 18px;
+
+    text-align: center;
+
+    font-size: 17px;
+    font-weight: 600;
+
+    color: #1f2937;
+}
+
+
+/* ==========================================
+   STARS
+========================================== */
+
+.rating-stars {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+
+    margin-bottom: 12px;
+}
+
+.rating-stars .star {
+    border: none;
+    background: transparent;
+
+    padding: 3px;
+
+    font-size: 42px;
+    line-height: 1;
+
+    color: #d1d5db;
+
+    cursor: pointer;
+
+    transition: all 0.15s ease;
+}
+
+.rating-stars .star:hover {
+    color: #fbbf24;
+    transform: scale(1.1);
+}
+
+.rating-stars .star.selected {
+    color: #f59e0b;
+}
+
+
+/* ==========================================
+   RATING VALUE
+========================================== */
+
+.rating-value {
+    text-align: center;
+
+    margin-bottom: 25px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #6b7280;
+}
+
+
+/* ==========================================
+   REVIEW LABEL
+========================================== */
+
+.rating-modal-content label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #374151;
+}
+
+
+/* ==========================================
+   REVIEW TEXTAREA
+========================================== */
+
+.rating-modal-content textarea {
+    width: 100%;
+    min-height: 120px;
+
+    box-sizing: border-box;
+
+    resize: vertical;
+
+    padding: 12px 14px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    color: #1f2937;
+
+    outline: none;
+
+    transition: border-color 0.2s ease;
+}
+
+.rating-modal-content textarea:focus {
+    border-color: #2563eb;
+}
+
+.rating-modal-content textarea::placeholder {
+    color: #9ca3af;
+}
+
+.rating-modal-content small {
+    display: block;
+
+    margin-top: 5px;
+
+    text-align: right;
+
+    color: #9ca3af;
+
+    font-size: 12px;
+}
+
+
+/* ==========================================
+   MODAL FOOTER
+========================================== */
+
+.rating-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    padding: 18px 24px;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+
+/* ==========================================
+   CANCEL BUTTON
+========================================== */
+
+.rating-cancel-btn {
+    padding: 10px 18px;
+
+    border: 1px solid #d1d5db;
+
+    background: white;
+
+    border-radius: 8px;
+
+    color: #374151;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.rating-cancel-btn:hover {
+    background: #f9fafb;
+}
+
+
+/* ==========================================
+   SUBMIT BUTTON
+========================================== */
+
+.rating-submit-btn {
+    padding: 10px 20px;
+
+    border: none;
+
+    background: #2563eb;
+
+    color: white;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.rating-submit-btn:hover:not(:disabled) {
+    background: #1d4ed8;
+}
+
+.rating-submit-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 600px) {
+
+    .rating-modal-overlay {
+        padding: 15px;
+    }
+
+    .rating-modal-header {
+        padding: 20px;
+    }
+
+    .rating-modal-content {
+        padding: 25px 20px;
+    }
+
+    .rating-modal-footer {
+        padding: 16px 20px;
+    }
+
+    .rating-stars .star {
+        font-size: 36px;
+    }
+
+    .rating-modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .rating-modal-footer button {
+        width: 100%;
+    }
+}
+
+/* ==========================================
+   RESCHEDULE BUTTON
+========================================== */
+
+.reschedule-btn {
+    border: none;
+    border-radius: 8px;
+
+    padding: 10px 16px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    background: #2563eb;
+    color: white;
+
+    transition: 0.2s ease;
+}
+
+.reschedule-btn:hover {
+    background: #1d4ed8;
+}
+
+
+/* ==========================================
+   APPOINTMENT ACTIONS
+========================================== */
+
+.appointment-actions {
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 18px;
+}
+
+
+/* ==========================================
+   CANCEL BUTTON
+========================================== */
+
+.cancel-appointment-btn {
+    border: none;
+    border-radius: 8px;
+
+    padding: 10px 16px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    background: #fee2e2;
+    color: #b91c1c;
+
+    transition: 0.2s ease;
+}
+
+.cancel-appointment-btn:hover {
+    background: #fecaca;
+}
+
+
+/* ==========================================
+   RESCHEDULE OVERLAY
+========================================== */
+
+.reschedule-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    z-index: 9999;
+}
+
+
+/* ==========================================
+   RESCHEDULE MODAL
+========================================== */
+
+.reschedule-modal {
+    width: 100%;
+    max-width: 500px;
+
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 28px;
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+
+/* ==========================================
+   MODAL HEADER
+========================================== */
+
+.reschedule-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: flex-start;
+
+    margin-bottom: 22px;
+}
+
+.reschedule-header h2 {
+    margin: 0;
+
+    font-size: 24px;
+}
+
+.reschedule-header p {
+    margin-top: 6px;
+
+    color: #6b7280;
+}
+
+.close-modal-btn {
+    border: none;
+
+    background: transparent;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    color: #6b7280;
+}
+
+
+/* ==========================================
+   CURRENT APPOINTMENT
+========================================== */
+
+.current-appointment {
+    padding: 16px;
+
+    margin-bottom: 22px;
+
+    background: #f3f4f6;
+
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    flex-wrap: wrap;
+}
+
+.current-appointment p {
+    width: 100%;
+
+    margin: 0 0 5px;
+
+    font-size: 13px;
+
+    color: #6b7280;
+}
+
+.current-appointment strong {
+    font-size: 15px;
+}
+
+.current-appointment span {
+    color: #6b7280;
+}
+
+
+/* ==========================================
+   FORM
+========================================== */
+
+.reschedule-form {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+.reschedule-form .form-group {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.reschedule-form label {
+    font-weight: 600;
+
+    font-size: 14px;
+
+    color: #374151;
+}
+
+.reschedule-form input {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 12px 14px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+
+    outline: none;
+}
+
+.reschedule-form input:focus {
+    border-color: #2563eb;
+}
+
+
+/* ==========================================
+   MODAL ACTIONS
+========================================== */
+
+.reschedule-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 5px;
+}
+
+.modal-cancel-btn,
+.confirm-reschedule-btn {
+    border: none;
+
+    border-radius: 8px;
+
+    padding: 11px 18px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.modal-cancel-btn {
+    background: #e5e7eb;
+
+    color: #374151;
+}
+
+.confirm-reschedule-btn {
+    background: #2563eb;
+
+    color: white;
+}
+
+.confirm-reschedule-btn:hover {
+    background: #1d4ed8;
+}
+
+.confirm-reschedule-btn:disabled,
+.modal-cancel-btn:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+/* ==========================================
+   MESSAGES
+========================================== */
+
+.completed-message {
+    margin-top: 16px;
+
+    padding: 10px 14px;
+
+    border-radius: 8px;
+
+    background: #dcfce7;
+
+    color: #166534;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+.cancelled-message {
+    margin-top: 16px;
+
+    padding: 10px 14px;
+
+    border-radius: 8px;
+
+    background: #fee2e2;
+
+    color: #991b1b;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+.absent-message {
+    margin-top: 16px;
+
+    padding: 10px 14px;
+
+    border-radius: 8px;
+
+    background: #fef3c7;
+
+    color: #92400e;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 600px) {
+
+    .reschedule-modal {
+        padding: 20px;
+
+        border-radius: 12px;
+    }
+
+    .reschedule-header h2 {
+        font-size: 20px;
+    }
+
+    .appointment-actions {
+        flex-direction: column;
+    }
+
+    .reschedule-btn,
+    .cancel-appointment-btn {
+        width: 100%;
+    }
+
+    .reschedule-actions {
+        flex-direction: column;
+    }
+
+    .modal-cancel-btn,
+    .confirm-reschedule-btn {
+        width: 100%;
+    }
+}

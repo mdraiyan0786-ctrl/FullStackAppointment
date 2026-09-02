@@ -1,0 +1,64 @@
+.hero{
+    width:90%;
+    margin:auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    min-height:90vh;
+}
+
+.hero-left{
+    width:50%;
+}
+
+.hero-left h1{
+    font-size:60px;
+    color:#1e3a8a;
+    margin-bottom:20px;
+}
+
+.hero-left p{
+    font-size:20px;
+    color:#555;
+    margin-bottom:30px;
+    line-height:35px;
+}
+
+.hero-left input{
+    width:500px;
+    padding:18px;
+    border-radius:10px;
+    border:1px solid lightgray;
+    font-size:17px;
+}
+
+.hero-buttons{
+    margin-top:30px;
+}
+
+.book-btn{
+    padding:15px 35px;
+    border:none;
+    background:#2563eb;
+    color:white;
+    border-radius:8px;
+    font-size:17px;
+    cursor:pointer;
+    margin-right:15px;
+}
+
+.find-btn{
+    padding:15px 35px;
+    border:none;
+    background:white;
+    border:2px solid #2563eb;
+    color:#2563eb;
+    border-radius:8px;
+    font-size:17px;
+    cursor:pointer;
+}
+
+.hero-right img{
+    width:500px;
+    border-radius:20px;
+}

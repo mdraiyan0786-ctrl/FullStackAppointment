@@ -1,0 +1,75 @@
+.doctor-login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90vh;
+  padding: 20px;
+}
+
+.doctor-login-card {
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 400px;
+}
+
+.doctor-login-card h1 {
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.doctor-login-card p {
+  text-align: center;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.doctor-login-card label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.doctor-login-card input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.doctor-login-card button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.doctor-login-card button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #dc2626;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.register-text {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.register-link {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
