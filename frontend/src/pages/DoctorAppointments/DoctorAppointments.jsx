@@ -1,8 +1,20 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../api/api";
 import "./DoctorAppointments.css";
 
 function DoctorAppointments() {
+
+    // =========================
+    // NAVIGATION
+    // =========================
+
+    const navigate = useNavigate();
+
+    // =========================
+    // STATES
+    // =========================
+
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -17,6 +29,7 @@ function DoctorAppointments() {
 
     const fetchAppointments = async () => {
         try {
+
             const response = await api.get(
                 "/appointments/doctor"
             );
@@ -25,6 +38,7 @@ function DoctorAppointments() {
             setError("");
 
         } catch (error) {
+
             console.error(
                 "Failed to fetch doctor appointments:",
                 error
@@ -36,7 +50,9 @@ function DoctorAppointments() {
             );
 
         } finally {
+
             setLoading(false);
+
         }
     };
 
@@ -53,6 +69,7 @@ function DoctorAppointments() {
     // =========================
 
     const handleComplete = async (id) => {
+
         const confirmComplete = window.confirm(
             "Are you sure you want to complete this appointment?"
         );
@@ -62,20 +79,22 @@ function DoctorAppointments() {
         }
 
         try {
+
             await api.put(
                 `/appointments/${id}/complete`
             );
 
-            setAppointments((previousAppointments) =>
-                previousAppointments.map(
-                    (appointment) =>
-                        appointment.id === id
-                            ? {
-                                  ...appointment,
-                                  status: "COMPLETED"
-                              }
-                            : appointment
-                )
+            setAppointments(
+                (previousAppointments) =>
+                    previousAppointments.map(
+                        (appointment) =>
+                            appointment.id === id
+                                ? {
+                                      ...appointment,
+                                      status: "COMPLETED"
+                                  }
+                                : appointment
+                    )
             );
 
             alert(
@@ -83,6 +102,7 @@ function DoctorAppointments() {
             );
 
         } catch (error) {
+
             console.error(
                 "Failed to complete appointment:",
                 error
@@ -100,6 +120,7 @@ function DoctorAppointments() {
     // =========================
 
     const handleCancel = async (id) => {
+
         const confirmCancel = window.confirm(
             "Are you sure you want to cancel this appointment?"
         );
@@ -109,20 +130,22 @@ function DoctorAppointments() {
         }
 
         try {
+
             await api.put(
                 `/appointments/${id}/cancel`
             );
 
-            setAppointments((previousAppointments) =>
-                previousAppointments.map(
-                    (appointment) =>
-                        appointment.id === id
-                            ? {
-                                  ...appointment,
-                                  status: "CANCELLED"
-                              }
-                            : appointment
-                )
+            setAppointments(
+                (previousAppointments) =>
+                    previousAppointments.map(
+                        (appointment) =>
+                            appointment.id === id
+                                ? {
+                                      ...appointment,
+                                      status: "CANCELLED"
+                                  }
+                                : appointment
+                    )
             );
 
             alert(
@@ -130,6 +153,7 @@ function DoctorAppointments() {
             );
 
         } catch (error) {
+
             console.error(
                 "Failed to cancel appointment:",
                 error
@@ -162,16 +186,17 @@ function DoctorAppointments() {
                 `/appointments/${id}/absent`
             );
 
-            setAppointments((previousAppointments) =>
-                previousAppointments.map(
-                    (appointment) =>
-                        appointment.id === id
-                            ? {
-                                ...appointment,
-                                status: "ABSENT"
-                            }
-                            : appointment
-                )
+            setAppointments(
+                (previousAppointments) =>
+                    previousAppointments.map(
+                        (appointment) =>
+                            appointment.id === id
+                                ? {
+                                      ...appointment,
+                                      status: "ABSENT"
+                                  }
+                                : appointment
+                    )
             );
 
             alert(
@@ -197,7 +222,10 @@ function DoctorAppointments() {
     // =========================
 
     const handleOpenPrescription = (appointment) => {
-        setPrescriptionOpen(appointment.id);
+
+        setPrescriptionOpen(
+            appointment.id
+        );
 
         setPrescriptionText(
             appointment.prescriptionText || ""
@@ -211,6 +239,7 @@ function DoctorAppointments() {
     // =========================
 
     const handleClosePrescription = () => {
+
         setPrescriptionOpen(null);
         setPrescriptionText("");
         setError("");
@@ -223,9 +252,11 @@ function DoctorAppointments() {
     const handleSavePrescription = async (id) => {
 
         if (!prescriptionText.trim()) {
+
             setError(
                 "Prescription cannot be empty."
             );
+
             return;
         }
 
@@ -233,6 +264,7 @@ function DoctorAppointments() {
         setError("");
 
         try {
+
             const response = await api.put(
                 `/appointments/${id}/prescription`,
                 {
@@ -244,7 +276,6 @@ function DoctorAppointments() {
             const updatedAppointment =
                 response.data;
 
-            // Update prescription AND status
             setAppointments(
                 (previousAppointments) =>
                     previousAppointments.map(
@@ -252,8 +283,10 @@ function DoctorAppointments() {
                             appointment.id === id
                                 ? {
                                       ...appointment,
+
                                       prescriptionText:
                                           updatedAppointment.prescriptionText,
+
                                       status:
                                           updatedAppointment.status
                                   }
@@ -269,6 +302,7 @@ function DoctorAppointments() {
             );
 
         } catch (error) {
+
             console.error(
                 "Failed to save prescription:",
                 error
@@ -280,8 +314,35 @@ function DoctorAppointments() {
             );
 
         } finally {
+
             setSavingPrescription(false);
+
         }
+    };
+
+    // =========================
+    // MEDICAL HISTORY
+    // =========================
+
+    const handleMedicalHistory = (appointment) => {
+
+        console.log(
+            "History clicked:",
+            appointment.user?.id
+        );
+
+        if (!appointment.user?.id) {
+
+            alert(
+                "Patient information is not available."
+            );
+
+            return;
+        }
+
+        navigate(
+            `/doctor/patient/${appointment.user.id}/medical-history`
+        );
     };
 
     // =========================
@@ -289,11 +350,14 @@ function DoctorAppointments() {
     // =========================
 
     if (loading) {
+
         return (
             <div className="doctor-appointments-page">
+
                 <div className="loading-message">
                     Loading appointments...
                 </div>
+
             </div>
         );
     }
@@ -303,11 +367,14 @@ function DoctorAppointments() {
     // =========================
 
     if (error && appointments.length === 0) {
+
         return (
             <div className="doctor-appointments-page">
+
                 <div className="error-message">
                     {error}
                 </div>
+
             </div>
         );
     }
@@ -318,6 +385,10 @@ function DoctorAppointments() {
 
     return (
         <div className="doctor-appointments-page">
+
+            {/* =========================
+                HEADER
+            ========================= */}
 
             <div className="doctor-appointments-header">
 
@@ -330,6 +401,10 @@ function DoctorAppointments() {
                 </p>
 
             </div>
+
+            {/* =========================
+                NO APPOINTMENTS
+            ========================= */}
 
             {appointments.length === 0 ? (
 
@@ -353,248 +428,328 @@ function DoctorAppointments() {
 
                 <div className="doctor-appointments-container">
 
-                    {appointments.map((appointment) => (
+                    {appointments.map(
+                        (appointment) => (
 
-                        <div
-                            className="doctor-appointment-card"
-                            key={appointment.id}
-                        >
+                            <div
+                                className="doctor-appointment-card"
+                                key={appointment.id}
+                            >
 
-                            {/* =========================
-                                CARD HEADER
-                            ========================= */}
+                                {/* =========================
+                                    CARD HEADER
+                                ========================= */}
 
-                            <div className="appointment-card-header">
-
-                                <div>
-
-                                    <h2>
-                                        {appointment.patientName}
-                                    </h2>
-
-                                    <span className="appointment-id">
-                                        Appointment #{appointment.id}
-                                    </span>
-
-                                </div>
-
-                                <span
-                                    className={`appointment-status ${
-                                        appointment.status ===
-                                        "BOOKED"
-                                            ? "status-booked"
-                                            : appointment.status ===
-                                              "CANCELLED"
-                                            ? "status-cancelled"
-                                            : "status-completed"
-                                    }`}
-                                >
-                                    {appointment.status}
-                                </span>
-
-                            </div>
-
-                            {/* =========================
-                                PATIENT DETAILS
-                            ========================= */}
-
-                            <div className="patient-details">
-
-                                <div className="detail-item">
-
-                                    <span className="detail-label">
-                                        Age
-                                    </span>
-
-                                    <span className="detail-value">
-                                        {appointment.age}
-                                    </span>
-
-                                </div>
-
-                                <div className="detail-item">
-
-                                    <span className="detail-label">
-                                        Gender
-                                    </span>
-
-                                    <span className="detail-value">
-                                        {appointment.gender}
-                                    </span>
-
-                                </div>
-
-                                <div className="detail-item">
-
-                                    <span className="detail-label">
-                                        Phone
-                                    </span>
-
-                                    <span className="detail-value">
-                                        {appointment.phone}
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-                            {/* =========================
-                                APPOINTMENT DATE/TIME
-                            ========================= */}
-
-                            <div className="appointment-info">
-
-                                <div className="appointment-info-item">
-
-                                    <span className="info-icon">
-                                        📅
-                                    </span>
+                                <div className="appointment-card-header">
 
                                     <div>
 
-                                        <span className="info-label">
-                                            Date
+                                        <h2>
+                                            {
+                                                appointment.patientName
+                                            }
+                                        </h2>
+
+                                        <span className="appointment-id">
+                                            Appointment #
+                                            {appointment.id}
                                         </span>
 
-                                        <strong>
-                                            {
-                                                appointment.appointmentDate
-                                            }
-                                        </strong>
+                                    </div>
+
+                                    <span
+                                        className={`appointment-status ${
+                                            appointment.status ===
+                                            "BOOKED"
+                                                ? "status-booked"
+                                                : appointment.status ===
+                                                  "CANCELLED"
+                                                ? "status-cancelled"
+                                                : appointment.status ===
+                                                  "ABSENT"
+                                                ? "status-absent"
+                                                : "status-completed"
+                                        }`}
+                                    >
+                                        {appointment.status}
+                                    </span>
+
+                                </div>
+
+                                {/* =========================
+                                    PATIENT DETAILS
+                                ========================= */}
+
+                                <div className="patient-details">
+
+                                    <div className="detail-item">
+
+                                        <span className="detail-label">
+                                            Age
+                                        </span>
+
+                                        <span className="detail-value">
+                                            {appointment.age}
+                                        </span>
+
+                                    </div>
+
+                                    <div className="detail-item">
+
+                                        <span className="detail-label">
+                                            Gender
+                                        </span>
+
+                                        <span className="detail-value">
+                                            {appointment.gender}
+                                        </span>
+
+                                    </div>
+
+                                    <div className="detail-item">
+
+                                        <span className="detail-label">
+                                            Phone
+                                        </span>
+
+                                        <span className="detail-value">
+                                            {appointment.phone}
+                                        </span>
 
                                     </div>
 
                                 </div>
 
-                                <div className="appointment-info-item">
+                                {/* =========================
+                                    APPOINTMENT DATE / TIME
+                                ========================= */}
 
-                                    <span className="info-icon">
-                                        🕐
-                                    </span>
+                                <div className="appointment-info">
 
-                                    <div>
+                                    <div className="appointment-info-item">
 
-                                        <span className="info-label">
-                                            Time
+                                        <span className="info-icon">
+                                            📅
                                         </span>
 
-                                        <strong>
-                                            {
-                                                appointment.appointmentTime
-                                            }
-                                        </strong>
+                                        <div>
 
-                                    </div>
+                                            <span className="info-label">
+                                                Date
+                                            </span>
 
-                                </div>
-
-                            </div>
-
-                            {/* =========================
-                                PRESCRIPTION
-                            ========================= */}
-
-                            <div className="doctor-prescription-section">
-
-                                {prescriptionOpen === appointment.id ? (
-
-                                    <div className="prescription-editor">
-
-                                        <h3>
-                                            Write Prescription
-                                        </h3>
-
-                                        <textarea
-                                            value={prescriptionText}
-                                            onChange={(e) =>
-                                                setPrescriptionText(
-                                                    e.target.value
-                                                )
-                                            }
-                                            placeholder="Write prescription and instructions here..."
-                                            rows="8"
-                                        />
-
-                                        {error && (
-                                            <p className="error-message">
-                                                {error}
-                                            </p>
-                                        )}
-
-                                        <div className="prescription-actions">
-
-                                            <button
-                                                className="save-prescription-btn"
-                                                onClick={() =>
-                                                    handleSavePrescription(
-                                                        appointment.id
-                                                    )
+                                            <strong>
+                                                {
+                                                    appointment.appointmentDate
                                                 }
-                                                disabled={
-                                                    savingPrescription
-                                                }
-                                            >
-                                                {savingPrescription
-                                                    ? "Saving..."
-                                                    : "Save Prescription"}
-                                            </button>
-
-                                            <button
-                                                className="cancel-prescription-btn"
-                                                onClick={
-                                                    handleClosePrescription
-                                                }
-                                                disabled={
-                                                    savingPrescription
-                                                }
-                                            >
-                                                Cancel
-                                            </button>
+                                            </strong>
 
                                         </div>
 
                                     </div>
 
-                                ) : (
+                                    <div className="appointment-info-item">
 
-                                    <div className="prescription-display">
+                                        <span className="info-icon">
+                                            🕐
+                                        </span>
 
-                                        <div className="prescription-header">
+                                        <div>
+
+                                            <span className="info-label">
+                                                Time
+                                            </span>
+
+                                            <strong>
+                                                {
+                                                    appointment.appointmentTime
+                                                }
+                                            </strong>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                {/* =========================
+                                    PRESCRIPTION
+                                ========================= */}
+
+                                <div className="doctor-prescription-section">
+
+                                    {prescriptionOpen ===
+                                    appointment.id ? (
+
+                                        <div className="prescription-editor">
 
                                             <h3>
-                                                Prescription
+                                                Write Prescription
                                             </h3>
 
-                                            <button
-                                                className="write-prescription-btn"
-                                                onClick={() =>
-                                                    handleOpenPrescription(
-                                                        appointment
+                                            <textarea
+                                                value={
+                                                    prescriptionText
+                                                }
+                                                onChange={(e) =>
+                                                    setPrescriptionText(
+                                                        e.target.value
                                                     )
                                                 }
-                                            >
-                                                {appointment.prescriptionText
-                                                    ? "Edit Prescription"
-                                                    : "Write Prescription"}
-                                            </button>
+                                                placeholder="Write prescription and instructions here..."
+                                                rows="8"
+                                            />
+
+                                            {error && (
+                                                <p className="error-message">
+                                                    {error}
+                                                </p>
+                                            )}
+
+                                            <div className="prescription-actions">
+
+                                                <button
+                                                    className="save-prescription-btn"
+                                                    onClick={() =>
+                                                        handleSavePrescription(
+                                                            appointment.id
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        savingPrescription
+                                                    }
+                                                >
+                                                    {savingPrescription
+                                                        ? "Saving..."
+                                                        : "Save Prescription"}
+                                                </button>
+
+                                                <button
+                                                    className="cancel-prescription-btn"
+                                                    onClick={
+                                                        handleClosePrescription
+                                                    }
+                                                    disabled={
+                                                        savingPrescription
+                                                    }
+                                                >
+                                                    Cancel
+                                                </button>
+
+                                            </div>
 
                                         </div>
 
-                                        {appointment.prescriptionText && (
+                                    ) : (
 
-                                            <div className="prescription-text">
-                                                {appointment.prescriptionText}
+                                        <div className="prescription-display">
+
+                                            <div className="prescription-header">
+
+                                                <h3>
+                                                    Prescription
+                                                </h3>
+
+                                                <button
+                                                    className="write-prescription-btn"
+                                                    onClick={() =>
+                                                        handleOpenPrescription(
+                                                            appointment
+                                                        )
+                                                    }
+                                                >
+                                                    {
+                                                        appointment.prescriptionText
+                                                            ? "Edit Prescription"
+                                                            : "Write Prescription"
+                                                    }
+                                                </button>
+
                                             </div>
 
-                                        )}
+                                            {appointment.prescriptionText && (
 
-                                        {!appointment.prescriptionText && (
+                                                <div className="prescription-text">
+                                                    {
+                                                        appointment.prescriptionText
+                                                    }
+                                                </div>
 
-                                            <p className="no-prescription">
-                                                No prescription added yet.
-                                            </p>
+                                            )}
 
-                                        )}
+                                            {!appointment.prescriptionText && (
+
+                                                <p className="no-prescription">
+                                                    No prescription added yet.
+                                                </p>
+
+                                            )}
+
+                                        </div>
+
+                                    )}
+
+                                </div>
+
+                                {/* =========================
+                                    APPOINTMENT ACTIONS
+                                ========================= */}
+
+                                {appointment.status === "BOOKED" && (
+
+                                    <div className="doctor-appointment-actions">
+
+                                        {/* COMPLETE */}
+
+                                        <button
+                                            className="complete-btn"
+                                            onClick={() =>
+                                                handleComplete(
+                                                    appointment.id
+                                                )
+                                            }
+                                        >
+                                            ✓ Complete
+                                        </button>
+
+                                        {/* CANCEL */}
+
+                                        <button
+                                            className="cancel-btn"
+                                            onClick={() =>
+                                                handleCancel(
+                                                    appointment.id
+                                                )
+                                            }
+                                        >
+                                            ✕ Cancel
+                                        </button>
+
+                                        {/* ABSENT */}
+
+                                        <button
+                                            className="absent-btn"
+                                            onClick={() =>
+                                                handleAbsent(
+                                                    appointment.id
+                                                )
+                                            }
+                                        >
+                                            👤 Patient Absent
+                                        </button>
+
+                                        {/* MEDICAL HISTORY */}
+
+                                        <button
+                                            className="medical-history-btn"
+                                            onClick={() =>
+                                                handleMedicalHistory(
+                                                    appointment
+                                                )
+                                            }
+                                        >
+                                            🩺 Medical History
+                                        </button>
 
                                     </div>
 
@@ -602,69 +757,8 @@ function DoctorAppointments() {
 
                             </div>
 
-                            {/* =========================
-                                APPOINTMENT ACTIONS
-                            ========================= */}
-
-                            {appointment.status === "BOOKED" && (
-
-                            <div className="doctor-appointment-actions">
-
-                                <button
-                                    className="complete-btn"
-                                    onClick={() =>
-                                        handleComplete(
-                                            appointment.id
-                                        )
-                                    }
-                                >
-                                    ✓ Complete
-                                </button>
-
-
-                                <button
-                                    className="cancel-btn"
-                                    onClick={() =>
-                                        handleCancel(
-                                            appointment.id
-                                        )
-                                    }
-                                >
-                                    ✕ Cancel
-                                </button>
-
-
-                                <button
-                                    className="absent-btn"
-                                    onClick={() =>
-                                        handleAbsent(
-                                            appointment.id
-                                        )
-                                    }
-                                >
-                                    👤 Patient Absent
-                                </button>
-
-                                <button
-                                    className="medical-history-btn"
-                                    onClick={() => {
-                                        console.log("History clicked:", appointment.user?.id);
-
-                                        navigate(
-                                            `/doctor/patient/${appointment.user?.id}/medical-history`
-                                        );
-                                    }}
-                                >
-                                    🩺 Medical History
-                                </button>
-
-                            </div>
-
-                        )}
-
-                        </div>
-
-                    ))}
+                        )
+                    )}
 
                 </div>
 
