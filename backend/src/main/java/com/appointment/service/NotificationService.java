@@ -9,22 +9,18 @@ import java.util.List;
 
 @Service
 public class NotificationService {
-
     private final NotificationRepository notificationRepository;
 
-    public NotificationService(
-            NotificationRepository notificationRepository) {
-
+    public NotificationService(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
     }
 
-    // Create notification
-    public Notification createNotification(
-            User user,
-            String message) {
+    // ============================================================
+    // CREATE NOTIFICATION
+    // ============================================================
 
+    public Notification createNotification(User user , String message){
         Notification notification = new Notification();
-
         notification.setMessage(message);
         notification.setUser(user);
         notification.setRead(false);
@@ -32,25 +28,34 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
-    // Get logged-in user's notifications
-    public List<Notification> getMyNotifications(Long userId) {
+    // ============================================================
+    // GET LOGGED-IN USER'S NOTIFICATIONS
+    // ============================================================
 
+    public List<Notification> getMyNotifications(Long userId){
         return notificationRepository
                 .findByUserIdOrderByCreatedAtDesc(userId);
     }
 
-    // Get unread notification count
+    // ============================================================
+    // GET UNREAD NOTIFICATION COUNT
+    // ============================================================
+
     public long getUnreadCount(Long userId) {
 
         return notificationRepository
                 .countByUserIdAndIsReadFalse(userId);
     }
 
-    // Mark notification as read
-    public void markAsRead(Long id) {
+    // ============================================================
+    // MARK NOTIFICATION AS READ
+    // ============================================================
+
+    public void markAsRead(Long notificationId, Long userId) {
 
         Notification notification =
-                notificationRepository.findById(id)
+                notificationRepository
+                        .findByIdAndUserId(notificationId, userId)
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Notification not found"
@@ -60,14 +65,5 @@ public class NotificationService {
         notification.setRead(true);
 
         notificationRepository.save(notification);
-    }
-
-    // Temporary test notification
-    public Notification createTestNotification(User user) {
-
-        return createNotification(
-                user,
-                "This is a test notification."
-        );
     }
 }

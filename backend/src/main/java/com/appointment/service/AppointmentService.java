@@ -6,7 +6,6 @@ import com.appointment.entity.User;
 import com.appointment.repository.AppointmentRepository;
 import com.appointment.repository.DoctorRepository;
 import com.appointment.repository.UserRepository;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +37,7 @@ public class AppointmentService {
         this.doctorRepository = doctorRepository;
         this.notificationService = notificationService;
     }
+
 
     // ==========================================
     // BOOK APPOINTMENT
@@ -96,7 +96,7 @@ public class AppointmentService {
 
 
         // ==========================================
-        // CREATE BOOKED NOTIFICATION
+        // NOTIFY PATIENT
         // ==========================================
 
         notificationService.createNotification(
@@ -112,6 +112,8 @@ public class AppointmentService {
 
         return savedAppointment;
     }
+
+
     // ==========================================
     // GET ALL APPOINTMENTS
     // ==========================================
@@ -120,6 +122,7 @@ public class AppointmentService {
 
         return appointmentRepository.findAll();
     }
+
 
     // ==========================================
     // GET APPOINTMENT BY ID
@@ -131,6 +134,7 @@ public class AppointmentService {
                 .findById(id)
                 .orElse(null);
     }
+
 
     // ==========================================
     // CANCEL APPOINTMENT
@@ -146,6 +150,11 @@ public class AppointmentService {
                                         "Appointment Not Found"
                                 ));
 
+
+        // ==========================================
+        // CHECK STATUS
+        // ==========================================
+
         if ("COMPLETED".equals(appointment.getStatus())) {
 
             throw new RuntimeException(
@@ -160,9 +169,19 @@ public class AppointmentService {
             );
         }
 
+
+        // ==========================================
+        // CANCEL APPOINTMENT
+        // ==========================================
+
         appointment.setStatus("CANCELLED");
 
         appointmentRepository.save(appointment);
+
+
+        // ==========================================
+        // NOTIFY PATIENT
+        // ==========================================
 
         notificationService.createNotification(
                 appointment.getUser(),
@@ -175,6 +194,7 @@ public class AppointmentService {
                         + " has been cancelled."
         );
     }
+
 
     // ==========================================
     // GET LOGGED-IN USER APPOINTMENTS
@@ -190,6 +210,8 @@ public class AppointmentService {
                 user.getId()
         );
     }
+
+
     // ==========================================
     // GET DOCTOR APPOINTMENTS
     // ==========================================
@@ -208,6 +230,7 @@ public class AppointmentService {
                 doctor.getId()
         );
     }
+
 
     // ==========================================
     // SAVE TEXT PRESCRIPTION
@@ -232,6 +255,11 @@ public class AppointmentService {
                                         "Appointment not found"
                                 ));
 
+
+        // ==========================================
+        // CHECK DOCTOR OWNERSHIP
+        // ==========================================
+
         if (appointment.getDoctor() == null ||
                 !appointment.getDoctor().getId()
                         .equals(doctor.getId())) {
@@ -241,12 +269,22 @@ public class AppointmentService {
             );
         }
 
+
+        // ==========================================
+        // CHECK CANCELLED
+        // ==========================================
+
         if ("CANCELLED".equals(appointment.getStatus())) {
 
             throw new RuntimeException(
                     "Cancelled appointment cannot have a prescription"
             );
         }
+
+
+        // ==========================================
+        // CHECK PRESCRIPTION
+        // ==========================================
 
         if (prescriptionText == null ||
                 prescriptionText.trim().isEmpty()) {
@@ -256,18 +294,42 @@ public class AppointmentService {
             );
         }
 
+
+        // ==========================================
+        // SAVE PRESCRIPTION
+        // ==========================================
+
         appointment.setPrescriptionText(
                 prescriptionText.trim()
         );
 
         appointment.setStatus("COMPLETED");
 
-        return appointmentRepository.save(appointment);
+
+        Appointment savedAppointment =
+                appointmentRepository.save(appointment);
+
+
+        // ==========================================
+        // NOTIFY PATIENT
+        // ==========================================
+
+        notificationService.createNotification(
+                appointment.getUser(),
+                "A prescription has been added for your appointment with "
+                        + appointment.getDoctor().getName()
+                        + " on "
+                        + appointment.getAppointmentDate()
+        );
+
+
+        return savedAppointment;
     }
 
+
     // ==========================================
-// MANUALLY COMPLETE APPOINTMENT
-// ==========================================
+    // MANUALLY COMPLETE APPOINTMENT
+    // ==========================================
 
     public Appointment completeAppointment(
             Long id,
@@ -282,8 +344,7 @@ public class AppointmentService {
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Doctor not found"
-                                )
-                        );
+                                ));
 
 
         // ==========================================
@@ -295,8 +356,7 @@ public class AppointmentService {
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Appointment not found"
-                                )
-                        );
+                                ));
 
 
         // ==========================================
@@ -326,7 +386,6 @@ public class AppointmentService {
             );
         }
 
-
         if ("COMPLETED".equals(
                 appointment.getStatus())) {
 
@@ -334,7 +393,6 @@ public class AppointmentService {
                     "Appointment is already completed"
             );
         }
-
 
         if ("ABSENT".equals(
                 appointment.getStatus())) {
@@ -353,9 +411,7 @@ public class AppointmentService {
 
 
         Appointment savedAppointment =
-                appointmentRepository.save(
-                        appointment
-                );
+                appointmentRepository.save(appointment);
 
 
         // ==========================================
@@ -376,6 +432,7 @@ public class AppointmentService {
 
         return savedAppointment;
     }
+
 
     // ==========================================
     // UPLOAD PRESCRIPTION FILE
@@ -400,6 +457,7 @@ public class AppointmentService {
                                         "Appointment not found"
                                 ));
 
+
         // ==========================================
         // CHECK DOCTOR OWNERSHIP
         // ==========================================
@@ -413,6 +471,7 @@ public class AppointmentService {
             );
         }
 
+
         // ==========================================
         // CHECK CANCELLED
         // ==========================================
@@ -424,6 +483,7 @@ public class AppointmentService {
             );
         }
 
+
         // ==========================================
         // CHECK FILE
         // ==========================================
@@ -434,6 +494,7 @@ public class AppointmentService {
                     "Prescription file cannot be empty"
             );
         }
+
 
         // ==========================================
         // CHECK FILE TYPE
@@ -454,6 +515,7 @@ public class AppointmentService {
             );
         }
 
+
         try {
 
             // ==========================================
@@ -469,6 +531,7 @@ public class AppointmentService {
             Files.createDirectories(
                     uploadDirectory
             );
+
 
             // ==========================================
             // GENERATE UNIQUE FILE NAME
@@ -488,11 +551,13 @@ public class AppointmentService {
                         );
             }
 
+
             String filename =
                     UUID.randomUUID() + extension;
 
             Path filePath =
                     uploadDirectory.resolve(filename);
+
 
             // ==========================================
             // SAVE FILE
@@ -503,6 +568,7 @@ public class AppointmentService {
                     filePath
             );
 
+
             // ==========================================
             // SAVE FILE URL
             // ==========================================
@@ -512,12 +578,34 @@ public class AppointmentService {
                             + filename
             );
 
-            // Prescription means completed
+
+            // ==========================================
+            // MARK COMPLETED
+            // ==========================================
+
             appointment.setStatus("COMPLETED");
 
-            return appointmentRepository.save(
-                    appointment
+
+            Appointment savedAppointment =
+                    appointmentRepository.save(
+                            appointment
+                    );
+
+
+            // ==========================================
+            // NOTIFY PATIENT
+            // ==========================================
+
+            notificationService.createNotification(
+                    appointment.getUser(),
+                    "A prescription has been uploaded for your appointment with "
+                            + appointment.getDoctor().getName()
+                            + " on "
+                            + appointment.getAppointmentDate()
             );
+
+
+            return savedAppointment;
 
         } catch (IOException e) {
 
@@ -527,9 +615,10 @@ public class AppointmentService {
         }
     }
 
+
     // ==========================================
-// MARK APPOINTMENT AS ABSENT
-// ==========================================
+    // MARK APPOINTMENT AS ABSENT
+    // ==========================================
 
     public Appointment markAbsent(
             Long id,
@@ -588,7 +677,6 @@ public class AppointmentService {
             );
         }
 
-
         if ("COMPLETED".equals(
                 appointment.getStatus())) {
 
@@ -596,7 +684,6 @@ public class AppointmentService {
                     "Completed appointment cannot be marked absent"
             );
         }
-
 
         if ("ABSENT".equals(
                 appointment.getStatus())) {
@@ -673,17 +760,29 @@ public class AppointmentService {
 
         return savedAppointment;
     }
+
+
     // ==========================================
     // GET MY MEDICAL HISTORY
     // ==========================================
 
-    public List<Appointment> getMyMedicalHistory(String email) {
-        User user = userRepository.findByEmail(email).
-                orElseThrow(() -> new RuntimeException("User Not Found"));
+    public List<Appointment> getMyMedicalHistory(
+            String email) {
 
-        return appointmentRepository.findByUserIdAndStatus(user.getId(),
-                "COMPLETED");
+        User user =
+                userRepository.findByEmail(email)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User Not Found"
+                                ));
+
+        return appointmentRepository
+                .findByUserIdAndStatus(
+                        user.getId(),
+                        "COMPLETED"
+                );
     }
+
 
     // ==========================================
     // RESCHEDULE APPOINTMENT
@@ -695,38 +794,116 @@ public class AppointmentService {
             LocalTime newTime,
             String patientEmail) {
 
-        User user = userRepository.findByEmail(patientEmail).orElseThrow(()->new RuntimeException("User Not Found"));
-        Appointment appointment = appointmentRepository.findById(id).orElseThrow(()->new RuntimeException("Appointment Not Found"));
+        User user =
+                userRepository.findByEmail(patientEmail)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User Not Found"
+                                ));
 
-        if(appointment.getUser()==null || !appointment.getUser().getId().equals(user.getId())){
-            throw new RuntimeException("You are not authorized to reschedule this appointment");
-        }
-        if("CANCELLED".equals(appointment.getStatus())){
-            throw new RuntimeException("Cancelled appointment cannot be rescheduled");
-        }
-        if("COMPLETED".equals(appointment.getStatus())){
-            throw new RuntimeException("Completed appointment cannot be rescheduled");
-        }
-        if("ABSENT".equals(appointment.getStatus())){
-            throw new RuntimeException("Absent appointment cannot be rescheduled");
+        Appointment appointment =
+                appointmentRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Appointment Not Found"
+                                ));
+
+
+        // ==========================================
+        // CHECK PATIENT OWNERSHIP
+        // ==========================================
+
+        if (appointment.getUser() == null ||
+                !appointment.getUser()
+                        .getId()
+                        .equals(user.getId())) {
+
+            throw new RuntimeException(
+                    "You are not authorized to reschedule this appointment"
+            );
         }
 
-        if(newDate==null){
-            throw new RuntimeException("Appointment date is required");
+
+        // ==========================================
+        // CHECK STATUS
+        // ==========================================
+
+        if ("CANCELLED".equals(
+                appointment.getStatus())) {
+
+            throw new RuntimeException(
+                    "Cancelled appointment cannot be rescheduled"
+            );
         }
-        if(newDate.isBefore(LocalDate.now())){
-            throw new RuntimeException("Appointment date cannot be in the past");
+
+        if ("COMPLETED".equals(
+                appointment.getStatus())) {
+
+            throw new RuntimeException(
+                    "Completed appointment cannot be rescheduled"
+            );
         }
+
+        if ("ABSENT".equals(
+                appointment.getStatus())) {
+
+            throw new RuntimeException(
+                    "Absent appointment cannot be rescheduled"
+            );
+        }
+
+
+        // ==========================================
+        // CHECK NEW DATE
+        // ==========================================
+
+        if (newDate == null) {
+
+            throw new RuntimeException(
+                    "Appointment date is required"
+            );
+        }
+
+        if (newDate.isBefore(LocalDate.now())) {
+
+            throw new RuntimeException(
+                    "Appointment date cannot be in the past"
+            );
+        }
+
+
+        // ==========================================
+        // CHECK NEW TIME
+        // ==========================================
+
         if (newTime == null) {
-            throw new RuntimeException("Appointment time is required");
+
+            throw new RuntimeException(
+                    "Appointment time is required"
+            );
         }
-        if (appointment.getAppointmentDate().equals(newDate)
+
+
+        // ==========================================
+        // CHECK SAME DATE AND TIME
+        // ==========================================
+
+        if (appointment.getAppointmentDate()
+                .equals(newDate)
                 &&
                 appointment.getAppointmentTime()
                         .equals(newTime)) {
 
-            throw new RuntimeException("New appointment time is the same as the current time");
+            throw new RuntimeException(
+                    "New appointment time is the same as the current time"
+            );
         }
+
+
+        // ==========================================
+        // CHECK DUPLICATE BOOKING
+        // ==========================================
+
         boolean alreadyBooked =
                 appointmentRepository
                         .existsByUserIdAndDoctorIdAndAppointmentDateAndStatus(
@@ -737,15 +914,29 @@ public class AppointmentService {
                         );
 
         if (alreadyBooked) {
-            throw new RuntimeException("You already have another appointment with this doctor on this day");
+
+            throw new RuntimeException(
+                    "You already have another appointment with this doctor on this day"
+            );
         }
+
+
+        // ==========================================
+        // UPDATE APPOINTMENT
+        // ==========================================
 
         appointment.setAppointmentDate(newDate);
         appointment.setAppointmentTime(newTime);
         appointment.setStatus("BOOKED");
 
+
         Appointment savedAppointment =
                 appointmentRepository.save(appointment);
+
+
+        // ==========================================
+        // NOTIFY PATIENT
+        // ==========================================
 
         notificationService.createNotification(
                 user,
@@ -756,23 +947,56 @@ public class AppointmentService {
                         + " at "
                         + newTime
         );
+
+
         return savedAppointment;
     }
 
+
+    // ==========================================
+    // GET PATIENT MEDICAL HISTORY FOR DOCTOR
+    // ==========================================
+
     public List<Appointment> getPatientMedicalHistoryForDoctor(
             Long patientId,
-            String doctorEmail){
+            String doctorEmail) {
 
-        Doctor doctor = doctorRepository.findByEmail(doctorEmail).orElseThrow(()->new RuntimeException("Doctor Not Found"));
-        User patient = userRepository.findById(patientId).orElseThrow(()->new RuntimeException("Patient Not Found"));
+        Doctor doctor =
+                doctorRepository.findByEmail(doctorEmail)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Doctor Not Found"
+                                ));
 
-        boolean hasAppointment = appointmentRepository.existsByDoctorIdAndUserId(
-                                doctor.getId(),
-                                patient.getId()
-                        );
-        if(!hasAppointment){
-            throw new RuntimeException("You are not authorized to view this patient's medical history");
+        User patient =
+                userRepository.findById(patientId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Patient Not Found"
+                                ));
+
+
+        // ==========================================
+        // CHECK DOCTOR-PATIENT RELATIONSHIP
+        // ==========================================
+
+        boolean hasAppointment =
+                appointmentRepository.existsByDoctorIdAndUserId(
+                        doctor.getId(),
+                        patient.getId()
+                );
+
+        if (!hasAppointment) {
+
+            throw new RuntimeException(
+                    "You are not authorized to view this patient's medical history"
+            );
         }
+
+
+        // ==========================================
+        // GET COMPLETED APPOINTMENTS
+        // ==========================================
 
         return appointmentRepository
                 .findByUserIdAndStatus(

@@ -65,29 +65,17 @@ public class NotificationController {
     // Mark notification as read
     @PutMapping("/{id}/read")
     public ResponseEntity<String> markAsRead(
-            @PathVariable Long id) {
+            @PathVariable Long id,Authentication authentication) {
 
-        notificationService.markAsRead(id);
-
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(
+                ()->new RuntimeException("User Not Found"));
+        notificationService.markAsRead(
+                id,
+                user.getId()
+        );
         return ResponseEntity.ok(
                 "Notification marked as read"
         );
-    }
-
-    // Temporary test notification
-    @PostMapping("/test")
-    public ResponseEntity<Notification> createTestNotification(
-            Authentication authentication) {
-
-        String email = authentication.getName();
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found"));
-
-        Notification notification =
-                notificationService.createTestNotification(user);
-
-        return ResponseEntity.ok(notification);
     }
 }
