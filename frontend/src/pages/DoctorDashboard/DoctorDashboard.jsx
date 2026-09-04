@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import Navbar from "../../component/Navbar/Navbar";
 import Footer from "../../component/Footer/Footer";
 import api from "../../api/api";
+
+import DoctorMedicalStores
+    from "../../component/DoctorMedicalStores/DoctorMedicalStores";
+
 import "./DoctorDashboard.css";
+
 
 function DoctorDashboard() {
 
@@ -67,6 +73,7 @@ function DoctorDashboard() {
             } finally {
 
                 setLoading(false);
+
             }
         };
 
@@ -136,6 +143,7 @@ function DoctorDashboard() {
             } finally {
 
                 setReviewsLoading(false);
+
             }
         };
 
@@ -242,6 +250,7 @@ function DoctorDashboard() {
                 <Footer />
             </>
         );
+
     }
 
 
@@ -266,6 +275,7 @@ function DoctorDashboard() {
                 <Footer />
             </>
         );
+
     }
 
 
@@ -554,10 +564,6 @@ function DoctorDashboard() {
                                             key={review.id}
                                         >
 
-                                            {/* ==========================================
-                                                REVIEW HEADER
-                                            ========================================== */}
-
                                             <div className="review-card-header">
 
                                                 <div className="review-patient">
@@ -602,10 +608,6 @@ function DoctorDashboard() {
                                             </div>
 
 
-                                            {/* ==========================================
-                                                STARS
-                                            ========================================== */}
-
                                             <div className="review-stars">
 
                                                 {[1, 2, 3, 4, 5].map(
@@ -632,10 +634,6 @@ function DoctorDashboard() {
 
                                             </div>
 
-
-                                            {/* ==========================================
-                                                COMMENT
-                                            ========================================== */}
 
                                             {review.comment && (
 
@@ -777,12 +775,12 @@ function DoctorDashboard() {
                                             </div>
 
 
-                                            <span
-                                                className="dashboard-status"
-                                            >
+                                            <span className="dashboard-status">
+
                                                 {
                                                     appointment.status
                                                 }
+
                                             </span>
 
                                         </div>
@@ -793,6 +791,17 @@ function DoctorDashboard() {
                             </div>
 
                         )}
+
+                    </div>
+
+
+                    {/* ==========================================
+                        MEDICAL STORES
+                    ========================================== */}
+
+                    <div className="dashboard-section">
+
+                        <DoctorMedicalStores />
 
                     </div>
 
@@ -962,9 +971,11 @@ function DoctorDashboard() {
 
 
                                             <span className="dashboard-status">
+
                                                 {
                                                     appointment.status
                                                 }
+
                                             </span>
 
                                         </div>

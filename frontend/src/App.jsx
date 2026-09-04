@@ -20,6 +20,8 @@ import DoctorDashboard from "./pages/DoctorDashboard/DoctorDashboard";
 import MedicalHistory from "./pages/MedicalHistory/MedicalHistory";
 import RescheduleAppointment from "./pages/RescheduleAppointment/RescheduleAppointment";
 import PatientMedicalHistory from "./pages/PatientMedicalHistory/PatientMedicalHistory";
+import MedicalStores from "./pages/MedicalStores/MedicalStores";
+import MedicalStoreDetails from "./pages/MedicalStoreDetails/MedicalStoreDetails";
 
 function App() {
   return (
@@ -44,7 +46,9 @@ function App() {
         <Route path="/doctor-dashboard" element={<DoctorDashboard />}/>
         <Route path="/medical-history" element={<MedicalHistory />}/>
         <Route path="/reschedule-appointment/:id" element={<RescheduleAppointment />}/>
+        <Route path="/stores" element={<MedicalStores />}/>
         <Route path="/doctor/patient/:patientId/medical-history" element={<PatientMedicalHistory />} />
+        <Route path="/stores/:id"  element={<MedicalStoreDetails />}/>
       </Routes>
     </BrowserRouter>
   );

@@ -1,0 +1,193 @@
+.medical-stores-page {
+    min-height: 70vh;
+    padding: 50px 8%;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.medical-stores-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.medical-stores-header h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.medical-stores-header p {
+    color: #666;
+    font-size: 16px;
+}
+
+
+/* ==========================================
+   SEARCH
+========================================== */
+
+.medical-store-search-container {
+    max-width: 700px;
+    margin: 0 auto 30px;
+
+    display: flex;
+    align-items: center;
+
+    border: 1px solid #ddd;
+    border-radius: 10px;
+
+    padding: 0 15px;
+
+    background: white;
+}
+
+.medical-store-search-icon {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.medical-store-search-bar {
+    width: 100%;
+    padding: 15px 5px;
+
+    border: none;
+    outline: none;
+
+    font-size: 16px;
+}
+
+
+/* ==========================================
+   RESULT COUNT
+========================================== */
+
+.medical-store-results-info {
+    max-width: 1100px;
+    margin: 0 auto 20px;
+}
+
+.medical-store-results-info p {
+    color: #555;
+}
+
+
+/* ==========================================
+   STORE LIST
+========================================== */
+
+.medical-store-list {
+    max-width: 1100px;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(320px, 1fr));
+
+    gap: 25px;
+}
+
+
+/* ==========================================
+   STORE CARD
+========================================== */
+
+.medical-store-card {
+    border: 1px solid #e5e5e5;
+    border-radius: 14px;
+
+    padding: 25px;
+
+    background: white;
+
+    display: flex;
+    gap: 20px;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+
+    transition: transform 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.medical-store-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.medical-store-card-icon {
+    font-size: 42px;
+}
+
+.medical-store-card-content {
+    flex: 1;
+}
+
+.medical-store-card h2 {
+    margin: 0 0 12px;
+    font-size: 22px;
+}
+
+.medical-store-card p {
+    margin: 7px 0;
+    color: #555;
+}
+
+.medical-store-address {
+    font-size: 15px;
+}
+
+.medical-store-phone {
+    font-size: 14px;
+}
+
+.medical-store-hours {
+    font-size: 14px;
+}
+
+.medical-store-description {
+    margin-top: 12px !important;
+    line-height: 1.5;
+}
+
+
+/* ==========================================
+   BUTTON
+========================================== */
+
+.view-store-btn {
+    margin-top: 15px;
+
+    padding: 10px 18px;
+
+    border: none;
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+
+/* ==========================================
+   EMPTY / ERROR
+========================================== */
+
+.medical-store-message,
+.no-medical-stores {
+    grid-column: 1 / -1;
+
+    text-align: center;
+
+    padding: 60px 20px;
+}
+
+.no-store-icon {
+    font-size: 45px;
+    margin-bottom: 15px;
+}
+
+.no-medical-stores p {
+    color: #666;
+}

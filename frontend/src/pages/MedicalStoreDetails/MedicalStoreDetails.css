@@ -1,0 +1,252 @@
+.store-details-page {
+    min-height: 70vh;
+    padding: 40px 8%;
+}
+
+/* ==========================================
+   BACK BUTTON
+========================================== */
+
+.back-to-stores {
+    border: none;
+    background: none;
+    cursor: pointer;
+
+    font-size: 15px;
+
+    margin-bottom: 25px;
+}
+
+
+/* ==========================================
+   STORE INFO
+========================================== */
+
+.store-info-card {
+    max-width: 1100px;
+    margin: 0 auto 45px;
+
+    display: flex;
+    gap: 25px;
+    align-items: flex-start;
+
+    padding: 30px;
+
+    border: 1px solid #e5e5e5;
+    border-radius: 15px;
+
+    background: white;
+
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+.store-info-icon {
+    font-size: 55px;
+}
+
+.store-info-content h1 {
+    margin: 0 0 15px;
+    font-size: 32px;
+}
+
+.store-info-content p {
+    margin: 8px 0;
+    color: #555;
+}
+
+.store-description {
+    margin-top: 18px !important;
+    line-height: 1.6;
+}
+
+
+/* ==========================================
+   DOCTORS SECTION
+========================================== */
+
+.store-doctors-section {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.store-doctors-header {
+    margin-bottom: 25px;
+}
+
+.store-doctors-header h2 {
+    font-size: 27px;
+    margin-bottom: 8px;
+}
+
+.store-doctors-header p {
+    color: #666;
+}
+
+
+/* ==========================================
+   DOCTOR LIST
+========================================== */
+
+.store-doctor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+/* ==========================================
+   DOCTOR CARD
+========================================== */
+
+.store-doctor-card {
+    display: grid;
+
+    grid-template-columns:
+        1.2fr 1.5fr auto;
+
+    gap: 25px;
+    align-items: center;
+
+    padding: 25px;
+
+    border: 1px solid #e5e5e5;
+    border-radius: 14px;
+
+    background: white;
+
+    box-shadow:
+        0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+
+/* ==========================================
+   DOCTOR INFO
+========================================== */
+
+.store-doctor-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.doctor-avatar {
+    width: 70px;
+    height: 70px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f1f1f1;
+
+    font-size: 35px;
+
+    overflow: hidden;
+}
+
+.doctor-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.store-doctor-info h3 {
+    margin: 0 0 6px;
+}
+
+.store-doctor-info p {
+    margin: 4px 0;
+    color: #666;
+}
+
+
+/* ==========================================
+   SCHEDULE
+========================================== */
+
+.doctor-schedule h4 {
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+.schedule-row {
+    display: flex;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 7px 0;
+
+    border-bottom: 1px solid #eee;
+}
+
+.schedule-row:last-child {
+    border-bottom: none;
+}
+
+
+/* ==========================================
+   BOOK BUTTON
+========================================== */
+
+.book-store-doctor-btn {
+    padding: 11px 18px;
+
+    border: none;
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+
+/* ==========================================
+   EMPTY / MESSAGE
+========================================== */
+
+.no-store-doctors,
+.store-details-message {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.no-store-doctors > div {
+    font-size: 45px;
+    margin-bottom: 10px;
+}
+
+.no-store-doctors p {
+    color: #666;
+}
+
+.store-details-message button {
+    margin-top: 15px;
+
+    padding: 10px 18px;
+
+    border: none;
+    border-radius: 7px;
+
+    cursor: pointer;
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 800px) {
+
+    .store-doctor-card {
+        grid-template-columns: 1fr;
+    }
+
+    .book-store-doctor-btn {
+        width: 100%;
+    }
+
+}

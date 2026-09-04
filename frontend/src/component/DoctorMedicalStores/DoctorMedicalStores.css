@@ -1,0 +1,436 @@
+/* =========================================
+   DOCTOR MEDICAL STORES
+========================================= */
+
+.doctor-medical-stores {
+    width: 100%;
+    margin-top: 30px;
+}
+
+
+/* =========================================
+   SECTION HEADER
+========================================= */
+
+.doctor-medical-stores .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.doctor-medical-stores .section-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.doctor-medical-stores .section-header p {
+    margin: 6px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+
+/* =========================================
+   SUCCESS / ERROR
+========================================= */
+
+.doctor-store-success {
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+    font-size: 14px;
+}
+
+.doctor-store-error {
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    font-size: 14px;
+}
+
+
+/* =========================================
+   SEARCH
+========================================= */
+
+.doctor-store-search {
+    width: 100%;
+    max-width: 600px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    padding: 0 15px;
+    margin-bottom: 22px;
+
+    box-sizing: border-box;
+}
+
+.doctor-store-search span {
+    font-size: 17px;
+    margin-right: 10px;
+}
+
+.doctor-store-search input {
+    width: 100%;
+    height: 100%;
+
+    border: none;
+    outline: none;
+
+    font-size: 14px;
+    color: #374151;
+    background: transparent;
+}
+
+.doctor-store-search input::placeholder {
+    color: #9ca3af;
+}
+
+
+/* =========================================
+   STORE LIST
+========================================= */
+
+.doctor-store-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+
+/* =========================================
+   STORE CARD
+========================================= */
+
+.doctor-store-card {
+    display: flex;
+    align-items: flex-start;
+
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.doctor-store-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+    border-color: #d1d5db;
+}
+
+
+/* =========================================
+   STORE ICON
+========================================= */
+
+.doctor-store-icon {
+    width: 52px;
+    height: 52px;
+
+    min-width: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+    background: #f0fdf4;
+
+    font-size: 25px;
+
+    margin-right: 16px;
+}
+
+
+/* =========================================
+   STORE CONTENT
+========================================= */
+
+.doctor-store-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.doctor-store-content h3 {
+    margin: 0 0 10px;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    color: #1f2937;
+}
+
+.doctor-store-content p {
+    margin: 6px 0;
+
+    font-size: 13px;
+    line-height: 1.5;
+
+    color: #6b7280;
+}
+
+
+/* =========================================
+   STORE NOT APPROVED
+========================================= */
+
+.doctor-store-not-approved {
+    display: inline-block;
+
+    margin-top: 12px;
+    padding: 6px 10px;
+
+    border-radius: 6px;
+
+    background: #fff7ed;
+    color: #c2410c;
+
+    border: 1px solid #fed7aa;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* =========================================
+   REQUEST STATUS
+========================================= */
+
+.doctor-store-status {
+    display: inline-block;
+
+    margin-top: 12px;
+    margin-right: 8px;
+
+    padding: 6px 11px;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.doctor-store-status.approved {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.doctor-store-status.rejected {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.doctor-store-status.pending {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+
+/* =========================================
+   REQUEST BUTTON
+========================================= */
+
+.doctor-store-request-btn {
+    display: block;
+
+    margin-top: 14px;
+
+    padding: 10px 16px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #2563eb;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.doctor-store-request-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.doctor-store-request-btn:disabled {
+    background: #93c5fd;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* =========================================
+   LOADING / EMPTY MESSAGE
+========================================= */
+
+.doctor-store-message {
+    width: 100%;
+
+    padding: 45px 20px;
+
+    box-sizing: border-box;
+
+    text-align: center;
+
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+
+    color: #6b7280;
+}
+
+.doctor-store-message div {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.doctor-store-message h3 {
+    margin: 0;
+
+    font-size: 17px;
+    color: #374151;
+}
+
+
+/* =========================================
+   MY STORE REQUESTS
+========================================= */
+
+.doctor-my-store-requests {
+    margin-top: 40px;
+}
+
+.doctor-my-store-requests .section-header {
+    margin-bottom: 16px;
+}
+
+.doctor-request-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+
+/* =========================================
+   REQUEST CARD
+========================================= */
+
+.doctor-request-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 17px 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    box-sizing: border-box;
+}
+
+.doctor-request-card h3 {
+    margin: 0 0 6px;
+
+    font-size: 16px;
+    font-weight: 650;
+
+    color: #1f2937;
+}
+
+.doctor-request-card p {
+    margin: 0;
+
+    font-size: 13px;
+    color: #6b7280;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .doctor-store-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .doctor-medical-stores {
+        margin-top: 20px;
+    }
+
+    .doctor-medical-stores .section-header h2 {
+        font-size: 21px;
+    }
+
+    .doctor-store-card {
+        padding: 15px;
+    }
+
+    .doctor-store-icon {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+
+        font-size: 21px;
+
+        margin-right: 12px;
+    }
+
+    .doctor-store-content h3 {
+        font-size: 16px;
+    }
+
+    .doctor-request-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .doctor-request-card .doctor-store-status {
+        margin-top: 0;
+    }
+
+    .doctor-store-search {
+        max-width: 100%;
+    }
+}
