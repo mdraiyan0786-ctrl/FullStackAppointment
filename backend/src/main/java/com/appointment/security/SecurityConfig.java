@@ -61,6 +61,12 @@ public class SecurityConfig {
                                 "/api/auth/**"
                         ).permitAll()
 
+                        // Medical Store Registration
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/medical-stores/register"
+                        ).permitAll()
+
                         // Doctor Registration / Login / Password Reset
                         .requestMatchers(
                                 "/api/doctors/register",
