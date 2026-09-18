@@ -18,11 +18,6 @@ public interface DoctorStoreRequestRepository
             Long medicalStoreId
     );
 
-    List<DoctorStoreRequest> findByDoctorIdAndStatus(
-            Long doctorId,
-            String status
-    );
-
     List<DoctorStoreRequest> findByMedicalStoreIdAndStatus(
             Long medicalStoreId,
             String status

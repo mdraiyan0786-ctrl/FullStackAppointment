@@ -6,28 +6,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
-
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final CustomUserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(
-            JwtService jwtService,
-            CustomUserDetailsService userDetailsService) {
-
+    public JwtAuthenticationFilter(JwtService jwtService) {
         this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -40,6 +33,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authHeader =
                 request.getHeader("Authorization");
 
+        /*
+         * No Authorization header.
+         *
+         * IMPORTANT:
+         * Do NOT return 401/403 here.
+         * Let Spring Security decide whether
+         * the endpoint is public or protected.
+         */
         if (authHeader == null ||
                 !authHeader.startsWith("Bearer ")) {
 
@@ -58,75 +59,44 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String role =
                     jwtService.extractRole(token);
 
-            System.out.println(
-                    "JWT EMAIL: " + email
-            );
-
-            System.out.println(
-                    "JWT ROLE: " + role
-            );
-
             if (email != null &&
                     SecurityContextHolder
                             .getContext()
                             .getAuthentication() == null) {
 
-                UserDetails userDetails =
-                        userDetailsService
-                                .loadUserByUsernameAndRole(
-                                        email,
-                                        role
-                                );
+                List<SimpleGrantedAuthority> authorities =
+                        role != null
+                                ? List.of(
+                                new SimpleGrantedAuthority(
+                                        "ROLE_" + role
+                                )
+                        )
+                                : List.of();
 
-                if (jwtService.isTokenValid(
-                        token,
-                        userDetails.getUsername())) {
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                email,
+                                null,
+                                authorities
+                        );
 
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities()
-                            );
-
-                    authentication.setDetails(
-                            new WebAuthenticationDetailsSource()
-                                    .buildDetails(request)
-                    );
-
-                    SecurityContextHolder
-                            .getContext()
-                            .setAuthentication(
-                                    authentication
-                            );
-
-                    System.out.println(
-                            "AUTHENTICATED USER: " +
-                                    authentication.getName()
-                    );
-
-                    System.out.println(
-                            "AUTHORITIES: " +
-                                    authentication.getAuthorities()
-                    );
-                }
+                SecurityContextHolder
+                        .getContext()
+                        .setAuthentication(authentication);
             }
 
         } catch (Exception e) {
 
-            System.out.println(
-                    "JWT authentication failed: " +
-                            e.getClass().getName() +
-                            " - " +
-                            e.getMessage()
-            );
-
+            /*
+             * Invalid/expired token.
+             *
+             * Do not directly return 403 here.
+             * Continue the chain and let Spring Security
+             * handle protected endpoints.
+             */
             SecurityContextHolder.clearContext();
         }
 
-        filterChain.doFilter(
-                request,
-                response
-        );
+        filterChain.doFilter(request, response);
     }
 }

@@ -127,4 +127,111 @@ public class DoctorStoreRequestService {
                 doctor.getId()
         );
     }
+    // ==========================================
+// STORE ADMIN VIEW THEIR STORE REQUESTS
+// ==========================================
+
+    public List<DoctorStoreRequest> getAdminRequests(
+            Long adminId) {
+
+        List<MedicalStore> stores =
+                medicalStoreRepository.findAll();
+
+        return stores.stream()
+                .filter(store ->
+                        store.getAdmin() != null
+                                && store.getAdmin().getId().equals(adminId))
+                .flatMap(store ->
+                        requestRepository
+                                .findByMedicalStoreId(store.getId())
+                                .stream())
+                .toList();
+    }
+
+    // ==========================================
+// ACCEPT REQUEST
+// ==========================================
+
+    public DoctorStoreRequest approveRequest(
+            Long requestId,
+            Long adminId) {
+
+        DoctorStoreRequest request =
+                requestRepository.findById(requestId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Store request not found"
+                                ));
+
+        MedicalStore medicalStore =
+                request.getMedicalStore();
+
+        // Make sure this store belongs to the logged-in admin
+        if (medicalStore.getAdmin() == null ||
+                !medicalStore.getAdmin()
+                        .getId()
+                        .equals(adminId)) {
+
+            throw new RuntimeException(
+                    "You are not authorized to manage this request"
+            );
+        }
+
+        // Only pending requests can be approved
+        if (!"PENDING".equalsIgnoreCase(
+                request.getStatus())) {
+
+            throw new RuntimeException(
+                    "This request has already been processed"
+            );
+        }
+
+        request.setStatus("APPROVED");
+
+        return requestRepository.save(request);
+    }
+
+
+// ==========================================
+// REJECT REQUEST
+// ==========================================
+
+    public DoctorStoreRequest rejectRequest(
+            Long requestId,
+            Long adminId) {
+
+        DoctorStoreRequest request =
+                requestRepository.findById(requestId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Store request not found"
+                                ));
+
+        MedicalStore medicalStore =
+                request.getMedicalStore();
+
+        // Make sure this store belongs to the logged-in admin
+        if (medicalStore.getAdmin() == null ||
+                !medicalStore.getAdmin()
+                        .getId()
+                        .equals(adminId)) {
+
+            throw new RuntimeException(
+                    "You are not authorized to manage this request"
+            );
+        }
+
+        // Only pending requests can be rejected
+        if (!"PENDING".equalsIgnoreCase(
+                request.getStatus())) {
+
+            throw new RuntimeException(
+                    "This request has already been processed"
+            );
+        }
+
+        request.setStatus("REJECTED");
+
+        return requestRepository.save(request);
+    }
 }

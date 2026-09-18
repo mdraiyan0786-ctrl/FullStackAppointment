@@ -1,6 +1,8 @@
 package com.appointment.controller;
 
 import com.appointment.dto.MedicalStoreRegistrationRequest;
+import com.appointment.dto.StoreAdminLoginRequest;
+import com.appointment.dto.StoreAdminLoginResponse;
 import com.appointment.entity.MedicalStore;
 import com.appointment.entity.StoreDoctorSchedule;
 import com.appointment.service.MedicalStoreService;
@@ -9,7 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
+import java.util.Map;
+import com.appointment.entity.DoctorStoreRequest;
 
+import java.util.List;
 @RestController
 @RequestMapping("/api/medical-stores")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -102,6 +107,36 @@ public class MedicalStoreController {
 
         return ResponseEntity.ok(
                 medicalStoreService.getMyStore(email)
+        );
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginStoreAdmin(
+            @RequestBody StoreAdminLoginRequest request) {
+
+        try {
+
+            StoreAdminLoginResponse response =
+                    medicalStoreService.loginStoreAdmin(
+                            request.email(),
+                            request.password()
+                    );
+
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException e) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+    @GetMapping("/{storeId}/approved-doctors")
+    public ResponseEntity<List<DoctorStoreRequest>> getApprovedDoctors(
+            @PathVariable Long storeId) {
+
+        return ResponseEntity.ok(
+                medicalStoreService.getApprovedDoctors(storeId)
         );
     }
 }

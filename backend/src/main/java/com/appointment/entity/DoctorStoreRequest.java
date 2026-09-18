@@ -1,7 +1,6 @@
 package com.appointment.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,39 +18,19 @@ public class DoctorStoreRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // =========================
-    // DOCTOR
-    // =========================
-
     @ManyToOne
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
-
-    // =========================
-    // MEDICAL STORE
-    // =========================
 
     @ManyToOne
     @JoinColumn(name = "medical_store_id", nullable = false)
     private MedicalStore medicalStore;
 
-    // =========================
-    // REQUEST STATUS
-    // =========================
-
     @Column(nullable = false)
     private String status;
 
-    // =========================
-    // REQUEST DATE
-    // =========================
-
     @Column(nullable = false)
     private LocalDateTime requestedAt;
-
-    // =========================
-    // CONSTRUCTORS
-    // =========================
 
     public DoctorStoreRequest() {
     }
@@ -70,20 +49,16 @@ public class DoctorStoreRequest {
         this.requestedAt = requestedAt;
     }
 
-    // =========================
-    // PRE PERSIST
-    // =========================
-
     @PrePersist
     public void prePersist() {
         if (requestedAt == null) {
             requestedAt = LocalDateTime.now();
         }
-    }
 
-    // =========================
-    // GETTERS AND SETTERS
-    // =========================
+        if (status == null) {
+            status = "PENDING";
+        }
+    }
 
     public Long getId() {
         return id;

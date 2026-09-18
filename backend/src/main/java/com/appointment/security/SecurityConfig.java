@@ -64,7 +64,8 @@ public class SecurityConfig {
                         // Medical Store Registration
                         .requestMatchers(
                                 HttpMethod.POST,
-                                "/api/medical-stores/register"
+                                "/api/medical-stores/register",
+                                "/api/medical-stores/login"
                         ).permitAll()
 
                         // Doctor Registration / Login / Password Reset
@@ -82,7 +83,10 @@ public class SecurityConfig {
                         // Doctors - public GET
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/api/doctors"
+                                "/api/doctors",
+                                "/api/doctors/**",
+                                "/api/medical-stores",
+                                "/api/medical-stores/**"
                         ).permitAll()
 
                         .requestMatchers(

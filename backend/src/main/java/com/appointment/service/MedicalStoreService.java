@@ -1,15 +1,20 @@
 package com.appointment.service;
 
 import com.appointment.dto.MedicalStoreRegistrationRequest;
+import com.appointment.dto.StoreAdminLoginResponse;
 import com.appointment.entity.MedicalStore;
 import com.appointment.entity.StoreDoctorSchedule;
 import com.appointment.entity.User;
 import com.appointment.repository.MedicalStoreRepository;
 import com.appointment.repository.StoreDoctorScheduleRepository;
 import com.appointment.repository.UserRepository;
+import com.appointment.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.appointment.entity.DoctorStoreRequest;
+import com.appointment.repository.DoctorStoreRequestRepository;
+
 
 import javax.swing.*;
 import java.util.List;
@@ -21,17 +26,24 @@ public class MedicalStoreService {
     private final StoreDoctorScheduleRepository scheduleRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final DoctorStoreRequestRepository doctorStoreRequestRepository;
 
     public MedicalStoreService(
             MedicalStoreRepository medicalStoreRepository,
             StoreDoctorScheduleRepository scheduleRepository,
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService,
+            DoctorStoreRequestRepository doctorStoreRequestRepository) {
 
         this.medicalStoreRepository = medicalStoreRepository;
         this.scheduleRepository = scheduleRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.doctorStoreRequestRepository =
+                doctorStoreRequestRepository;
     }
 
     // ==========================================
@@ -222,5 +234,68 @@ public class MedicalStoreService {
                 .orElseThrow(()->new RuntimeException(
                         "No medical store found for this admin"
                 ));
+    }
+
+    public StoreAdminLoginResponse loginStoreAdmin(
+            String email,
+            String password) {
+
+        if (email == null || email.trim().isEmpty()) {
+            throw new RuntimeException("Email is required");
+        }
+
+        if (password == null || password.isEmpty()) {
+            throw new RuntimeException("Password is required");
+        }
+
+        User admin = userRepository.findByEmail(email.trim())
+                .orElseThrow(() ->
+                        new RuntimeException("Invalid email or password"));
+
+        if (!"STORE_ADMIN".equalsIgnoreCase(admin.getRole())) {
+            throw new RuntimeException(
+                    "This account is not a medical store account");
+        }
+
+        if (!passwordEncoder.matches(password, admin.getPassword())) {
+            throw new RuntimeException("Invalid email or password");
+        }
+
+        MedicalStore store = medicalStoreRepository
+                .findByAdminId(admin.getId())
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "No medical store found for this account"));
+
+        String token = jwtService.generateToken(
+                admin.getEmail(),
+                "STORE_ADMIN"
+        );
+
+        return new StoreAdminLoginResponse(
+                token,
+                admin.getId(),
+                admin.getName(),
+                admin.getEmail(),
+                admin.getRole(),
+                store.getId(),
+                store.getName()
+        );
+    }
+
+    public List<DoctorStoreRequest> getApprovedDoctors(
+            Long storeId) {
+
+        medicalStoreRepository.findById(storeId)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Medical store not found"
+                        ));
+
+        return doctorStoreRequestRepository
+                .findByMedicalStoreIdAndStatus(
+                        storeId,
+                        "APPROVED"
+                );
     }
 }
