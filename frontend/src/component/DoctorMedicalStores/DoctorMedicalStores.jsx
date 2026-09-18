@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../api/api";
+import "./DoctorMedicalStores.css";
 
 function DoctorMedicalStores() {
+
+    const navigate = useNavigate();
 
     const [stores, setStores] = useState([]);
     const [requests, setRequests] = useState([]);
@@ -58,7 +62,7 @@ function DoctorMedicalStores() {
 
 
     // ==========================================
-    // FETCH MY REQUESTS
+    // FETCH MY STORE APPLICATIONS
     // ==========================================
 
     useEffect(() => {
@@ -95,7 +99,7 @@ function DoctorMedicalStores() {
 
 
     // ==========================================
-    // SEND REQUEST
+    // APPLY TO WORK WITH STORE
     // ==========================================
 
     const sendRequest = async (storeId) => {
@@ -112,7 +116,7 @@ function DoctorMedicalStores() {
                 );
 
             setMessage(
-                "Request sent successfully."
+                "Application sent successfully."
             );
 
             setRequests((previousRequests) => [
@@ -129,13 +133,13 @@ function DoctorMedicalStores() {
         } catch (error) {
 
             console.error(
-                "Failed to send store request:",
+                "Failed to send store application:",
                 error
             );
 
             setError(
                 error.response?.data?.message ||
-                "Unable to send request."
+                "Unable to send application."
             );
 
         } finally {
@@ -147,7 +151,7 @@ function DoctorMedicalStores() {
 
 
     // ==========================================
-    // GET REQUEST STATUS
+    // GET APPLICATION STATUS
     // ==========================================
 
     const getRequestStatus = (storeId) => {
@@ -205,12 +209,24 @@ function DoctorMedicalStores() {
 
 
     // ==========================================
+    // VIEW STORE
+    // ==========================================
+
+    const viewStore = (storeId) => {
+
+        navigate(`/stores/${storeId}`);
+
+    };
+
+
+    // ==========================================
     // PAGE
     // ==========================================
 
     return (
 
         <div className="doctor-medical-stores">
+
 
             {/* ==========================================
                 HEADER
@@ -225,7 +241,7 @@ function DoctorMedicalStores() {
                     </h2>
 
                     <p>
-                        Request to work at approved medical stores.
+                        Find medical stores and apply to work with them.
                     </p>
 
                 </div>
@@ -288,7 +304,9 @@ function DoctorMedicalStores() {
             {loading && (
 
                 <div className="doctor-store-message">
+
                     Loading medical stores...
+
                 </div>
 
             )}
@@ -310,6 +328,11 @@ function DoctorMedicalStores() {
                         <h3>
                             No medical stores found
                         </h3>
+
+                        <p>
+                            Try searching with a different
+                            store name or address.
+                        </p>
 
                     </div>
 
@@ -343,9 +366,19 @@ function DoctorMedicalStores() {
                                         key={store.id}
                                     >
 
+
+                                        {/* ==========================================
+                                            STORE ICON
+                                        ========================================== */}
+
                                         <div className="doctor-store-icon">
                                             🏥
                                         </div>
+
+
+                                        {/* ==========================================
+                                            STORE CONTENT
+                                        ========================================== */}
 
                                         <div className="doctor-store-content">
 
@@ -368,32 +401,114 @@ function DoctorMedicalStores() {
                                             </p>
 
 
+                                            {store.description && (
+
+                                                <p>
+                                                    {store.description}
+                                                </p>
+
+                                            )}
+
+
+                                            {/* ==========================================
+                                                STORE NOT APPROVED
+                                            ========================================== */}
+
                                             {!isApprovedStore && (
 
                                                 <span className="doctor-store-not-approved">
+
                                                     Store awaiting approval
+
                                                 </span>
 
                                             )}
 
+
+                                            {/* ==========================================
+                                                APPLICATION STATUS
+                                            ========================================== */}
 
                                             {status && (
 
                                                 <span
-                                                    className={getStatusClass(
-                                                        status
-                                                    )}
+                                                    className={
+                                                        getStatusClass(
+                                                            status
+                                                        )
+                                                    }
                                                 >
-                                                    {status}
+
+                                                    {status === "APPROVED"
+                                                        ? "YOU WORK HERE"
+                                                        : status}
+
                                                 </span>
 
                                             )}
 
 
-                                            {isApprovedStore &&
-                                                !status && (
+                                            {/* ==========================================
+                                                ACTION BUTTONS
+                                            ========================================== */}
+
+                                            <div className="doctor-store-actions">
+
+
+                                                {/* VIEW STORE */}
+
+                                                <button
+                                                    type="button"
+                                                    className="doctor-store-view-btn"
+                                                    onClick={() =>
+                                                        viewStore(
+                                                            store.id
+                                                        )
+                                                    }
+                                                >
+                                                    View Store
+                                                </button>
+
+
+                                                {/* ==========================================
+                                                    WORK WITH STORE
+                                                ========================================== */}
+
+                                                {isApprovedStore &&
+                                                    !status && (
+
+                                                        <button
+                                                            type="button"
+                                                            className="doctor-store-request-btn"
+                                                            disabled={
+                                                                requestLoading ===
+                                                                store.id
+                                                            }
+                                                            onClick={() =>
+                                                                sendRequest(
+                                                                    store.id
+                                                                )
+                                                            }
+                                                        >
+
+                                                            {requestLoading ===
+                                                            store.id
+                                                                ? "Applying..."
+                                                                : "Work With This Store"}
+
+                                                        </button>
+
+                                                    )}
+
+
+                                                {/* ==========================================
+                                                    APPLY AGAIN
+                                                ========================================== */}
+
+                                                {status === "REJECTED" && (
 
                                                     <button
+                                                        type="button"
                                                         className="doctor-store-request-btn"
                                                         disabled={
                                                             requestLoading ===
@@ -405,36 +520,17 @@ function DoctorMedicalStores() {
                                                             )
                                                         }
                                                     >
+
                                                         {requestLoading ===
                                                         store.id
-                                                            ? "Sending..."
-                                                            : "Request to Work Here"}
+                                                            ? "Applying..."
+                                                            : "Apply Again"}
+
                                                     </button>
 
                                                 )}
 
-
-                                            {status === "REJECTED" && (
-
-                                                <button
-                                                    className="doctor-store-request-btn"
-                                                    disabled={
-                                                        requestLoading ===
-                                                        store.id
-                                                    }
-                                                    onClick={() =>
-                                                        sendRequest(
-                                                            store.id
-                                                        )
-                                                    }
-                                                >
-                                                    {requestLoading ===
-                                                    store.id
-                                                        ? "Sending..."
-                                                        : "Send Request Again"}
-                                                </button>
-
-                                            )}
+                                            </div>
 
                                         </div>
 
@@ -451,23 +547,24 @@ function DoctorMedicalStores() {
 
 
             {/* ==========================================
-                MY REQUESTS
+                MY STORE APPLICATIONS
             ========================================== */}
 
             {requests.length > 0 && (
 
                 <div className="doctor-my-store-requests">
 
+
                     <div className="section-header">
 
                         <div>
 
                             <h2>
-                                My Store Requests
+                                My Store Applications
                             </h2>
 
                             <p>
-                                Track your requests to work at medical stores.
+                                Track your applications to medical stores.
                             </p>
 
                         </div>
@@ -500,12 +597,19 @@ function DoctorMedicalStores() {
 
                                     </div>
 
+
                                     <span
-                                        className={getStatusClass(
-                                            request.status
-                                        )}
+                                        className={
+                                            getStatusClass(
+                                                request.status
+                                            )
+                                        }
                                     >
-                                        {request.status}
+
+                                        {request.status === "APPROVED"
+                                            ? "YOU WORK HERE"
+                                            : request.status}
+
                                     </span>
 
                                 </div>
@@ -520,6 +624,7 @@ function DoctorMedicalStores() {
             )}
 
         </div>
+
     );
 }
 

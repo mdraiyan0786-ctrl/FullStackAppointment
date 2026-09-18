@@ -8,8 +8,12 @@ api.interceptors.request.use(
   (config) => {
     const doctorToken = localStorage.getItem("doctorToken");
     const userToken = localStorage.getItem("token");
+    const storeAdminToken = localStorage.getItem("storeAdminToken");
 
-    const token = doctorToken || userToken;
+    const token =
+      doctorToken ||
+      userToken ||
+      storeAdminToken;
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

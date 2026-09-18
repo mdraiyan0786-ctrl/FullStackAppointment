@@ -476,3 +476,41 @@
 .login-dropdown a:hover {
     background: #f3f4f6;
 }
+
+/* ==========================================
+   REGISTER / LOGIN DROPDOWN
+========================================== */
+
+.login-wrapper {
+    position: relative;
+}
+
+.login-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 255px;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    border: 1px solid #e5e7eb;
+    z-index: 1000;
+}
+
+.login-dropdown a {
+    display: block;
+    padding: 15px 20px;
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 15px;
+    transition: background 0.2s ease;
+}
+
+.login-dropdown a:hover {
+    background: #f3f6ff;
+}
+
+.login-dropdown a + a {
+    border-top: 1px solid #f0f0f0;
+}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import Navbar from "../../component/Navbar/Navbar";
 import Footer from "../../component/Footer/Footer";
+
 import api from "../../api/api";
 
 import "./MedicalStores.css";
@@ -16,6 +17,21 @@ function MedicalStores() {
     const [error, setError] = useState("");
 
     const [search, setSearch] = useState("");
+
+    // Doctor application states
+    const [doctorRequests, setDoctorRequests] = useState([]);
+    const [requestLoading, setRequestLoading] = useState(false);
+
+    // ==========================================
+    // CHECK DOCTOR LOGIN
+    // ==========================================
+
+    const doctorToken =
+        localStorage.getItem("doctorToken");
+
+    const isDoctorLoggedIn =
+        Boolean(doctorToken);
+
 
     // ==========================================
     // GET MEDICAL STORES
@@ -48,6 +64,7 @@ function MedicalStores() {
                 );
 
                 setError(
+                    error.response?.data?.message ||
                     "Unable to load medical stores."
                 );
 
@@ -62,27 +79,225 @@ function MedicalStores() {
 
     }, []);
 
+
+    // ==========================================
+    // GET DOCTOR'S STORE REQUESTS
+    // ==========================================
+
+    useEffect(() => {
+
+        if (!isDoctorLoggedIn) {
+            return;
+        }
+
+        const fetchDoctorRequests = async () => {
+
+            try {
+
+                const response =
+                    await api.get(
+                        "/doctor-store-requests/my"
+                    );
+
+                if (Array.isArray(response.data)) {
+
+                    setDoctorRequests(response.data);
+
+                } else {
+
+                    setDoctorRequests([]);
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Failed to fetch doctor store requests:",
+                    error
+                );
+
+                /*
+                 * Do not block the Medical Stores page
+                 * if the request list cannot be loaded.
+                 */
+                setDoctorRequests([]);
+
+            }
+
+        };
+
+        fetchDoctorRequests();
+
+    }, [isDoctorLoggedIn]);
+
+
+    // ==========================================
+    // GET REQUEST STATUS FOR STORE
+    // ==========================================
+
+    const getRequestForStore = (storeId) => {
+
+        return doctorRequests.find(
+            (request) =>
+                request.medicalStore?.id === storeId
+        );
+
+    };
+
+
+    // ==========================================
+    // SEND WORK WITH THEM REQUEST
+    // ==========================================
+
+    const handleWorkWithThem = async (store) => {
+
+        if (!isDoctorLoggedIn) {
+
+            navigate("/doctor-login");
+
+            return;
+        }
+
+
+        if (
+            !store.status ||
+            store.status.toUpperCase() !== "APPROVED"
+        ) {
+
+            alert(
+                "This medical store is not approved yet."
+            );
+
+            return;
+        }
+
+
+        const existingRequest =
+            getRequestForStore(store.id);
+
+
+        if (
+            existingRequest?.status === "PENDING"
+        ) {
+
+            alert(
+                "Your application is already pending."
+            );
+
+            return;
+        }
+
+
+        if (
+            existingRequest?.status === "APPROVED"
+        ) {
+
+            alert(
+                "You are already associated with this medical store."
+            );
+
+            return;
+        }
+
+
+        try {
+
+            setRequestLoading(true);
+
+            const response =
+                await api.post(
+                    `/doctor-store-requests/${store.id}`
+                );
+
+            /*
+             * Add/update the request locally
+             * so the button changes immediately.
+             */
+            if (response.data) {
+
+                setDoctorRequests(
+                    (previousRequests) => {
+
+                        const existingIndex =
+                            previousRequests.findIndex(
+                                (request) =>
+                                    request.medicalStore?.id ===
+                                    store.id
+                            );
+
+
+                        if (existingIndex !== -1) {
+
+                            const updated =
+                                [...previousRequests];
+
+                            updated[existingIndex] =
+                                response.data;
+
+                            return updated;
+
+                        }
+
+
+                        return [
+                            ...previousRequests,
+                            response.data
+                        ];
+
+                    }
+                );
+
+            }
+
+            alert(
+                "Application sent successfully."
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Failed to send store request:",
+                error
+            );
+
+            alert(
+                error.response?.data?.message ||
+                "Failed to send application."
+            );
+
+        } finally {
+
+            setRequestLoading(false);
+
+        }
+
+    };
+
+
     // ==========================================
     // FILTER STORES
     // ==========================================
 
-    const filteredStores = stores.filter((store) => {
+    const filteredStores = stores.filter(
+        (store) => {
 
-        const storeName =
-            store.name?.toLowerCase() || "";
+            const storeName =
+                store.name?.toLowerCase() || "";
 
-        const address =
-            store.address?.toLowerCase() || "";
+            const address =
+                store.address?.toLowerCase() || "";
 
-        const searchValue =
-            search.trim().toLowerCase();
+            const searchValue =
+                search.trim().toLowerCase();
 
-        return (
-            storeName.includes(searchValue) ||
-            address.includes(searchValue)
-        );
+            return (
+                storeName.includes(searchValue) ||
+                address.includes(searchValue)
+            );
 
-    });
+        }
+    );
+
 
     // ==========================================
     // PAGE
@@ -93,6 +308,7 @@ function MedicalStores() {
             <Navbar />
 
             <div className="medical-stores-page">
+
 
                 {/* ==========================================
                     HEADER
@@ -144,13 +360,17 @@ function MedicalStores() {
                     <div className="medical-store-results-info">
 
                         <p>
+
                             Showing{" "}
+
                             <strong>
                                 {filteredStores.length}
                             </strong>{" "}
+
                             {filteredStores.length === 1
                                 ? "medical store"
                                 : "medical stores"}
+
                         </p>
 
                     </div>
@@ -163,6 +383,9 @@ function MedicalStores() {
                 ========================================== */}
 
                 <div className="medical-store-list">
+
+
+                    {/* LOADING */}
 
                     {loading && (
 
@@ -177,6 +400,8 @@ function MedicalStores() {
                     )}
 
 
+                    {/* ERROR */}
+
                     {!loading && error && (
 
                         <div className="medical-store-message">
@@ -189,6 +414,8 @@ function MedicalStores() {
 
                     )}
 
+
+                    {/* NO STORES */}
 
                     {!loading &&
                         !error &&
@@ -214,66 +441,221 @@ function MedicalStores() {
                         )}
 
 
+                    {/* STORE CARDS */}
+
                     {!loading &&
                         !error &&
                         filteredStores.length > 0 && (
 
                             filteredStores.map(
-                                (store) => (
+                                (store) => {
 
-                                    <div
-                                        className="medical-store-card"
-                                        key={store.id}
-                                    >
+                                    const request =
+                                        getRequestForStore(
+                                            store.id
+                                        );
 
-                                        <div className="medical-store-card-icon">
-                                            🏥
-                                        </div>
+                                    const storeApproved =
+                                        store.status?.toUpperCase() ===
+                                        "APPROVED";
 
-                                        <div className="medical-store-card-content">
 
-                                            <h2>
-                                                {store.name}
-                                            </h2>
+                                    return (
 
-                                            <p className="medical-store-address">
-                                                📍 {store.address}
-                                            </p>
+                                        <div
+                                            className="medical-store-card"
+                                            key={store.id}
+                                        >
 
-                                            <p className="medical-store-phone">
-                                                📞 {store.phone}
-                                            </p>
 
-                                            <p className="medical-store-hours">
-                                                🕒 {store.openingTime}
-                                                {" - "}
-                                                {store.closingTime}
-                                            </p>
+                                            {/* STORE ICON */}
 
-                                            {store.description && (
+                                            <div className="medical-store-card-icon">
+                                                🏥
+                                            </div>
 
-                                                <p className="medical-store-description">
-                                                    {store.description}
+
+                                            {/* STORE CONTENT */}
+
+                                            <div className="medical-store-card-content">
+
+                                                <h2>
+                                                    {store.name}
+                                                </h2>
+
+
+                                                <p className="medical-store-address">
+                                                    📍 {store.address}
                                                 </p>
 
-                                            )}
 
-                                            <button
-                                                className="view-store-btn"
-                                                onClick={() =>
-                                                    navigate(
-                                                        `/stores/${store.id}`
-                                                    )
-                                                }
-                                            >
-                                                View Store
-                                            </button>
+                                                <p className="medical-store-phone">
+                                                    📞 {store.phone}
+                                                </p>
+
+
+                                                <p className="medical-store-hours">
+                                                    🕒 {store.openingTime}
+                                                    {" - "}
+                                                    {store.closingTime}
+                                                </p>
+
+
+                                                {store.description && (
+
+                                                    <p className="medical-store-description">
+                                                        {store.description}
+                                                    </p>
+
+                                                )}
+
+
+                                                {/* ==========================================
+                                                    STORE STATUS
+                                                ========================================== */}
+
+                                                {store.status && (
+
+                                                    <div
+                                                        className={
+                                                            storeApproved
+                                                                ? "medical-store-status approved"
+                                                                : "medical-store-status pending"
+                                                        }
+                                                    >
+
+                                                        {storeApproved
+                                                            ? "✓ Approved"
+                                                            : "⏳ Awaiting Approval"}
+
+                                                    </div>
+
+                                                )}
+
+
+                                                {/* ==========================================
+                                                    BUTTONS
+                                                ========================================== */}
+
+                                                <div className="medical-store-actions">
+
+
+                                                    {/* VIEW STORE */}
+
+                                                    <button
+                                                        className="view-store-btn"
+                                                        onClick={() =>
+                                                            navigate(
+                                                                `/stores/${store.id}`
+                                                            )
+                                                        }
+                                                    >
+                                                        View Store
+                                                    </button>
+
+
+                                                    {/* ==========================================
+                                                        DOCTOR ONLY
+                                                    ========================================== */}
+
+                                                    {isDoctorLoggedIn &&
+                                                        storeApproved && (
+
+                                                            <>
+                                                                {/* PENDING */}
+
+                                                                {request?.status?.toUpperCase() ===
+                                                                    "PENDING" && (
+
+                                                                    <button
+                                                                        className="work-store-btn pending"
+                                                                        disabled
+                                                                    >
+                                                                        ⏳ Application Pending
+                                                                    </button>
+
+                                                                )}
+
+
+                                                                {/* APPROVED */}
+
+                                                                {request?.status?.toUpperCase() ===
+                                                                    "APPROVED" && (
+
+                                                                    <button
+                                                                        className="work-store-btn approved"
+                                                                        disabled
+                                                                    >
+                                                                        ✓ You Work Here
+                                                                    </button>
+
+                                                                )}
+
+
+                                                                {/* REJECTED */}
+
+                                                                {request?.status?.toUpperCase() ===
+                                                                    "REJECTED" && (
+
+                                                                    <button
+                                                                        className="work-store-btn"
+                                                                        disabled={
+                                                                            requestLoading
+                                                                        }
+                                                                        onClick={() =>
+                                                                            handleWorkWithThem(
+                                                                                store
+                                                                            )
+                                                                        }
+                                                                    >
+
+                                                                        {requestLoading
+                                                                            ? "Applying..."
+                                                                            : "Apply Again"}
+
+                                                                    </button>
+
+                                                                )}
+
+
+                                                                {/* NO PREVIOUS REQUEST */}
+
+                                                                {!request && (
+
+                                                                    <button
+                                                                        className="work-store-btn"
+                                                                        disabled={
+                                                                            requestLoading
+                                                                        }
+                                                                        onClick={() =>
+                                                                            handleWorkWithThem(
+                                                                                store
+                                                                            )
+                                                                        }
+                                                                    >
+
+                                                                        {requestLoading
+                                                                            ? "Applying..."
+                                                                            : "Work With Them"}
+
+                                                                    </button>
+
+                                                                )}
+
+                                                            </>
+
+                                                        )}
+
+                                                </div>
+
+                                            </div>
 
                                         </div>
 
-                                    </div>
+                                    );
 
-                                )
+                                }
+
                             )
 
                         )}
@@ -286,5 +668,6 @@ function MedicalStores() {
         </>
     );
 }
+
 
 export default MedicalStores;

@@ -1,0 +1,223 @@
+/* ==========================================
+   PAGE
+========================================== */
+
+.medical-store-register-page {
+    min-height: 100vh;
+    background: #f6f8fb;
+    padding: 50px 20px 70px;
+}
+
+
+/* ==========================================
+   CONTAINER
+========================================== */
+
+.medical-store-register-container {
+    max-width: 850px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 40px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.medical-store-register-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.register-store-icon {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 15px;
+    border-radius: 16px;
+    background: #eef4ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+}
+
+.medical-store-register-header h1 {
+    margin: 0 0 10px;
+    color: #1f2937;
+    font-size: 30px;
+}
+
+.medical-store-register-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+
+/* ==========================================
+   FORM SECTION
+========================================== */
+
+.form-section {
+    margin-bottom: 30px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.form-section h2 {
+    margin: 0 0 22px;
+    font-size: 20px;
+    color: #1f2937;
+}
+
+
+/* ==========================================
+   FORM
+========================================== */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    margin-bottom: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    padding: 12px 14px;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+
+/* ==========================================
+   FORM ROW
+========================================== */
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+
+/* ==========================================
+   ERROR
+========================================== */
+
+.register-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 12px 15px;
+    border-radius: 9px;
+    margin-bottom: 18px;
+    font-size: 14px;
+}
+
+
+/* ==========================================
+   SUCCESS
+========================================== */
+
+.register-success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+    padding: 12px 15px;
+    border-radius: 9px;
+    margin-bottom: 18px;
+    font-size: 14px;
+}
+
+
+/* ==========================================
+   REGISTER BUTTON
+========================================== */
+
+.medical-store-register-btn {
+    width: 100%;
+    border: none;
+    background: #2563eb;
+    color: #ffffff;
+    padding: 14px 20px;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.medical-store-register-btn:hover {
+    background: #1d4ed8;
+}
+
+.medical-store-register-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+
+/* ==========================================
+   NOTE
+========================================== */
+
+.approval-note {
+    text-align: center;
+    margin: 15px 0 0;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 650px) {
+
+    .medical-store-register-page {
+        padding: 25px 15px 50px;
+    }
+
+    .medical-store-register-container {
+        padding: 25px 18px;
+    }
+
+    .medical-store-register-header h1 {
+        font-size: 25px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+}

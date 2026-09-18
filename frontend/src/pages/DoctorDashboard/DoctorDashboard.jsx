@@ -5,9 +5,6 @@ import Navbar from "../../component/Navbar/Navbar";
 import Footer from "../../component/Footer/Footer";
 import api from "../../api/api";
 
-import DoctorMedicalStores
-    from "../../component/DoctorMedicalStores/DoctorMedicalStores";
-
 import "./DoctorDashboard.css";
 
 
@@ -796,17 +793,6 @@ function DoctorDashboard() {
 
 
                     {/* ==========================================
-                        MEDICAL STORES
-                    ========================================== */}
-
-                    <div className="dashboard-section">
-
-                        <DoctorMedicalStores />
-
-                    </div>
-
-
-                    {/* ==========================================
                         QUICK ACTIONS
                     ========================================== */}
 
@@ -864,22 +850,10 @@ function DoctorDashboard() {
                                 </h2>
 
                                 <p>
-                                    Your next patient appointments
+                                    Your next scheduled appointments
                                 </p>
 
                             </div>
-
-
-                            <button
-                                className="view-all-btn"
-                                onClick={() =>
-                                    navigate(
-                                        "/doctor-appointments"
-                                    )
-                                }
-                            >
-                                View All
-                            </button>
 
                         </div>
 

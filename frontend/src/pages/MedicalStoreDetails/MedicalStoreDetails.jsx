@@ -14,12 +14,14 @@ function MedicalStoreDetails() {
 
     const [store, setStore] = useState(null);
     const [doctorSchedules, setDoctorSchedules] = useState([]);
+    const [approvedDoctors, setApprovedDoctors] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+
     // ==========================================
-    // FETCH STORE + DOCTORS
+    // FETCH STORE + DOCTORS + SCHEDULES
     // ==========================================
 
     useEffect(() => {
@@ -41,7 +43,15 @@ function MedicalStoreDetails() {
                         `/medical-stores/${id}/doctors`
                     );
 
+                const approvedDoctorsResponse =
+                    await api.get(
+                        `/medical-stores/${id}/approved-doctors`
+                    );
+
                 setStore(storeResponse.data);
+
+
+                // SCHEDULES
 
                 if (
                     Array.isArray(
@@ -59,6 +69,25 @@ function MedicalStoreDetails() {
 
                 }
 
+
+                // APPROVED DOCTORS
+
+                if (
+                    Array.isArray(
+                        approvedDoctorsResponse.data
+                    )
+                ) {
+
+                    setApprovedDoctors(
+                        approvedDoctorsResponse.data
+                    );
+
+                } else {
+
+                    setApprovedDoctors([]);
+
+                }
+
             } catch (error) {
 
                 console.error(
@@ -67,6 +96,7 @@ function MedicalStoreDetails() {
                 );
 
                 setError(
+                    error.response?.data?.message ||
                     "Unable to load medical store details."
                 );
 
@@ -121,7 +151,8 @@ function MedicalStoreDetails() {
                 <div className="store-details-message">
 
                     <h2>
-                        {error || "Medical store not found."}
+                        {error ||
+                            "Medical store not found."}
                     </h2>
 
                     <button
@@ -145,7 +176,29 @@ function MedicalStoreDetails() {
     // GROUP SCHEDULES BY DOCTOR
     // ==========================================
 
-    const doctors = {};
+    const doctorMap = {};
+
+
+    // First add all approved doctors
+
+    approvedDoctors.forEach((request) => {
+
+        const doctor =
+            request.doctor;
+
+        if (!doctor?.id) {
+            return;
+        }
+
+        doctorMap[doctor.id] = {
+            doctor: doctor,
+            schedules: []
+        };
+
+    });
+
+
+    // Then add schedules
 
     doctorSchedules.forEach((schedule) => {
 
@@ -156,23 +209,26 @@ function MedicalStoreDetails() {
             return;
         }
 
-        if (!doctors[doctorId]) {
 
-            doctors[doctorId] = {
+        if (!doctorMap[doctorId]) {
+
+            doctorMap[doctorId] = {
                 doctor: schedule.doctor,
                 schedules: []
             };
 
         }
 
-        doctors[doctorId].schedules.push(
+
+        doctorMap[doctorId].schedules.push(
             schedule
         );
 
     });
 
+
     const doctorList =
-        Object.values(doctors);
+        Object.values(doctorMap);
 
 
     // ==========================================
@@ -184,6 +240,7 @@ function MedicalStoreDetails() {
             <Navbar />
 
             <div className="store-details-page">
+
 
                 {/* ==========================================
                     BACK BUTTON
@@ -255,12 +312,14 @@ function MedicalStoreDetails() {
                         </h2>
 
                         <p>
-                            View the doctors and their
-                            available hours at this location.
+                            View doctors working at this
+                            medical store and their schedules.
                         </p>
 
                     </div>
 
+
+                    {/* NO DOCTORS */}
 
                     {doctorList.length === 0 && (
 
@@ -284,6 +343,8 @@ function MedicalStoreDetails() {
                     )}
 
 
+                    {/* DOCTOR LIST */}
+
                     {doctorList.length > 0 && (
 
                         <div className="store-doctor-list">
@@ -299,7 +360,9 @@ function MedicalStoreDetails() {
                                         key={doctor.id}
                                     >
 
-                                        {/* DOCTOR */}
+                                        {/* ==========================================
+                                            DOCTOR INFO
+                                        ========================================== */}
 
                                         <div className="store-doctor-info">
 
@@ -319,6 +382,7 @@ function MedicalStoreDetails() {
                                                 )}
 
                                             </div>
+
 
                                             <div>
 
@@ -346,7 +410,9 @@ function MedicalStoreDetails() {
                                         </div>
 
 
-                                        {/* SCHEDULE */}
+                                        {/* ==========================================
+                                            SCHEDULE
+                                        ========================================== */}
 
                                         <div className="doctor-schedule">
 
@@ -354,43 +420,61 @@ function MedicalStoreDetails() {
                                                 Available at this store
                                             </h4>
 
-                                            {schedules.map(
-                                                (schedule) => (
 
-                                                    <div
-                                                        className="schedule-row"
-                                                        key={schedule.id}
-                                                    >
+                                            {schedules.length === 0 ? (
 
-                                                        <strong>
-                                                            {schedule.dayOfWeek}
-                                                        </strong>
+                                                <p>
+                                                    Schedule not added yet.
+                                                </p>
 
-                                                        <span>
-                                                            {schedule.startTime}
-                                                            {" - "}
-                                                            {schedule.endTime}
-                                                        </span>
+                                            ) : (
 
-                                                    </div>
+                                                schedules.map(
+                                                    (schedule) => (
 
+                                                        <div
+                                                            className="schedule-row"
+                                                            key={schedule.id}
+                                                        >
+
+                                                            <strong>
+                                                                {schedule.dayOfWeek}
+                                                            </strong>
+
+                                                            <span>
+                                                                {schedule.startTime}
+                                                                {" - "}
+                                                                {schedule.endTime}
+                                                            </span>
+
+                                                        </div>
+
+                                                    )
                                                 )
+
                                             )}
 
                                         </div>
 
 
-                                        {/* BOOK */}
+                                        {/* ==========================================
+                                            BOOK
+                                        ========================================== */}
 
                                         <button
                                             className="book-store-doctor-btn"
+                                            disabled={
+                                                schedules.length === 0
+                                            }
                                             onClick={() =>
                                                 navigate(
                                                     `/appointment?doctorId=${doctor.id}&storeId=${store.id}`
                                                 )
                                             }
                                         >
-                                            Book Appointment
+                                            {schedules.length === 0
+                                                ? "Schedule Not Available"
+                                                : "Book Appointment"}
                                         </button>
 
                                     </div>

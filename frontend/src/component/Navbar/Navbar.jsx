@@ -9,6 +9,13 @@ function Navbar() {
 
     const token = localStorage.getItem("token");
     const doctorToken = localStorage.getItem("doctorToken");
+    const storeAdminToken = localStorage.getItem("storeAdminToken");
+
+    const isStoreAdminLoggedIn = Boolean(storeAdminToken);
+
+    const storeAdminInfo = JSON.parse(
+        localStorage.getItem("storeAdminInfo") || "null"
+    );
 
     const doctorInfo = doctorToken
         ? JSON.parse(
@@ -50,6 +57,21 @@ function Navbar() {
 
         localStorage.removeItem("doctorToken");
         localStorage.removeItem("doctorInfo");
+
+        navigate("/");
+
+        window.location.reload();
+    };
+
+
+    // =========================
+    // STORE ADMIN LOGOUT
+    // =========================
+
+    const handleStoreAdminLogout = () => {
+
+        localStorage.removeItem("storeAdminToken");
+        localStorage.removeItem("storeAdminInfo");
 
         navigate("/");
 
@@ -281,7 +303,7 @@ function Navbar() {
 
 
                 {/* =========================
-                    USER APPOINTMENTS
+                    PATIENT APPOINTMENTS
                 ========================= */}
 
                 {token && (
@@ -324,17 +346,15 @@ function Navbar() {
                 </li>
 
 
-                {/* =========================
-                    LOGGED IN USER
-                ========================= */}
+                {/* =================================================
+                    LOGGED IN PATIENT
+                ================================================= */}
 
                 {token && (
 
                     <>
 
-                        {/* =========================
-                            NOTIFICATION
-                        ========================= */}
+                        {/* NOTIFICATIONS */}
 
                         <li className="notification-wrapper">
 
@@ -467,9 +487,7 @@ function Navbar() {
                         </li>
 
 
-                        {/* =========================
-                            USER PROFILE
-                        ========================= */}
+                        {/* PATIENT PROFILE */}
 
                         <li>
 
@@ -484,9 +502,7 @@ function Navbar() {
                         </li>
 
 
-                        {/* =========================
-                            USER LOGOUT
-                        ========================= */}
+                        {/* PATIENT LOGOUT */}
 
                         <li>
 
@@ -506,17 +522,13 @@ function Navbar() {
                 )}
 
 
-                {/* =========================
+                {/* =================================================
                     LOGGED IN DOCTOR
-                ========================= */}
+                ================================================= */}
 
                 {doctorToken && (
 
                     <>
-
-                        {/* =========================
-                            DOCTOR DASHBOARD
-                        ========================= */}
 
                         <li>
 
@@ -526,10 +538,6 @@ function Navbar() {
 
                         </li>
 
-
-                        {/* =========================
-                            DOCTOR PROFILE
-                        ========================= */}
 
                         <li>
 
@@ -547,10 +555,6 @@ function Navbar() {
 
                         </li>
 
-
-                        {/* =========================
-                            DOCTOR LOGOUT
-                        ========================= */}
 
                         <li>
 
@@ -570,17 +574,78 @@ function Navbar() {
                 )}
 
 
-                {/* =========================
-                    LOGGED OUT
-                ========================= */}
+                {/* =================================================
+                    LOGGED IN MEDICAL STORE
+                ================================================= */}
 
-                {!token && !doctorToken && (
+                {isStoreAdminLoggedIn && (
 
                     <>
 
-                        {/* =========================
-                            LOGIN
-                        ========================= */}
+                        {/* STORE DASHBOARD */}
+
+                        <li>
+
+                            <Link to="/store-admin-dashboard">
+                                Dashboard
+                            </Link>
+
+                        </li>
+
+
+                        {/* STORE PROFILE */}
+
+                        <li>
+
+                            <button
+                                className="profile-btn"
+                                onClick={() =>
+                                    navigate(
+                                        "/store-admin-dashboard"
+                                    )
+                                }
+                            >
+
+                                {storeAdminInfo?.storeName
+                                    ? storeAdminInfo.storeName
+                                    : "Store Profile"}
+
+                            </button>
+
+                        </li>
+
+
+                        {/* STORE LOGOUT */}
+
+                        <li>
+
+                            <button
+                                className="profile-btn"
+                                onClick={
+                                    handleStoreAdminLogout
+                                }
+                            >
+                                Logout
+                            </button>
+
+                        </li>
+
+                    </>
+
+                )}
+
+
+                {/* =================================================
+                    LOGGED OUT
+                ================================================= */}
+
+                {!token &&
+                    !doctorToken &&
+                    !isStoreAdminLoggedIn && (
+
+                    <>
+
+                        {/* LOGIN */}
 
                         <li className="login-wrapper">
 
@@ -601,9 +666,7 @@ function Navbar() {
                                     <Link
                                         to="/login"
                                         onClick={() =>
-                                            setShowLoginMenu(
-                                                false
-                                            )
+                                            setShowLoginMenu(false)
                                         }
                                     >
                                         Login as Patient
@@ -613,12 +676,20 @@ function Navbar() {
                                     <Link
                                         to="/doctor-login"
                                         onClick={() =>
-                                            setShowLoginMenu(
-                                                false
-                                            )
+                                            setShowLoginMenu(false)
                                         }
                                     >
                                         Login as Doctor
+                                    </Link>
+
+
+                                    <Link
+                                        to="/medical-store-login"
+                                        onClick={() =>
+                                            setShowLoginMenu(false)
+                                        }
+                                    >
+                                        Login as Medical Store
                                     </Link>
 
                                 </div>
@@ -628,9 +699,7 @@ function Navbar() {
                         </li>
 
 
-                        {/* =========================
-                            REGISTER
-                        ========================= */}
+                        {/* REGISTER */}
 
                         <li className="login-wrapper">
 
@@ -651,9 +720,7 @@ function Navbar() {
                                     <Link
                                         to="/register"
                                         onClick={() =>
-                                            setShowRegisterMenu(
-                                                false
-                                            )
+                                            setShowRegisterMenu(false)
                                         }
                                     >
                                         Register as Patient
@@ -663,12 +730,20 @@ function Navbar() {
                                     <Link
                                         to="/doctor-register"
                                         onClick={() =>
-                                            setShowRegisterMenu(
-                                                false
-                                            )
+                                            setShowRegisterMenu(false)
                                         }
                                     >
                                         Register as Doctor
+                                    </Link>
+
+
+                                    <Link
+                                        to="/medical-store-register"
+                                        onClick={() =>
+                                            setShowRegisterMenu(false)
+                                        }
+                                    >
+                                        Register as Medical Store
                                     </Link>
 
                                 </div>
