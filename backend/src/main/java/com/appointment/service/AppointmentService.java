@@ -2,9 +2,13 @@ package com.appointment.service;
 
 import com.appointment.entity.Appointment;
 import com.appointment.entity.Doctor;
+import com.appointment.entity.DoctorStoreRequest;
+import com.appointment.entity.MedicalStore;
 import com.appointment.entity.User;
 import com.appointment.repository.AppointmentRepository;
 import com.appointment.repository.DoctorRepository;
+import com.appointment.repository.DoctorStoreRequestRepository;
+import com.appointment.repository.MedicalStoreRepository;
 import com.appointment.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,17 +29,24 @@ public class AppointmentService {
     private final UserRepository userRepository;
     private final DoctorRepository doctorRepository;
     private final NotificationService notificationService;
+    private final MedicalStoreRepository medicalStoreRepository;
+    private final DoctorStoreRequestRepository doctorStoreRequestRepository;
 
     public AppointmentService(
             AppointmentRepository appointmentRepository,
             UserRepository userRepository,
             DoctorRepository doctorRepository,
-            NotificationService notificationService) {
+            NotificationService notificationService,
+            MedicalStoreRepository medicalStoreRepository,
+            DoctorStoreRequestRepository doctorStoreRequestRepository) {
 
         this.appointmentRepository = appointmentRepository;
         this.userRepository = userRepository;
         this.doctorRepository = doctorRepository;
         this.notificationService = notificationService;
+        this.medicalStoreRepository = medicalStoreRepository;
+        this.doctorStoreRequestRepository =
+                doctorStoreRequestRepository;
     }
 
 
@@ -47,14 +58,92 @@ public class AppointmentService {
             Appointment appointment,
             String email) {
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+        User user =
+                userRepository.findByEmail(email)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User not found"
+                                ));
 
-        Doctor doctor = doctorRepository.findById(
-                appointment.getDoctor().getId()
-        ).orElseThrow(() ->
-                new RuntimeException("Doctor not found"));
+
+        // ==========================================
+        // CHECK DOCTOR
+        // ==========================================
+
+        if (appointment.getDoctor() == null ||
+                appointment.getDoctor().getId() == null) {
+
+            throw new RuntimeException(
+                    "Doctor is required"
+            );
+        }
+
+
+        Doctor doctor =
+                doctorRepository.findById(
+                                appointment.getDoctor().getId()
+                        )
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Doctor not found"
+                                ));
+
+
+        // ==========================================
+        // MEDICAL STORE
+        // ==========================================
+
+        MedicalStore medicalStore = null;
+
+
+        if (appointment.getMedicalStore() != null &&
+                appointment.getMedicalStore().getId() != null) {
+
+            Long storeId =
+                    appointment.getMedicalStore().getId();
+
+
+            // ==========================================
+            // FIND MEDICAL STORE
+            // ==========================================
+
+            medicalStore =
+                    medicalStoreRepository
+                            .findById(storeId)
+                            .orElseThrow(() ->
+                                    new RuntimeException(
+                                            "Medical store not found"
+                                    ));
+
+
+            // ==========================================
+            // CHECK DOCTOR-STORE REQUEST
+            // ==========================================
+
+            DoctorStoreRequest request =
+                    doctorStoreRequestRepository
+                            .findByDoctorIdAndMedicalStoreId(
+                                    doctor.getId(),
+                                    medicalStore.getId()
+                            )
+                            .orElseThrow(() ->
+                                    new RuntimeException(
+                                            "This doctor is not associated with this medical store"
+                                    ));
+
+
+            // ==========================================
+            // CHECK APPROVAL
+            // ==========================================
+
+            if (!"APPROVED".equalsIgnoreCase(
+                    request.getStatus())) {
+
+                throw new RuntimeException(
+                        "This doctor is not approved to work at this medical store"
+                );
+            }
+        }
 
 
         // ==========================================
@@ -84,6 +173,7 @@ public class AppointmentService {
 
         appointment.setUser(user);
         appointment.setDoctor(doctor);
+        appointment.setMedicalStore(medicalStore);
         appointment.setStatus("BOOKED");
 
 
@@ -92,7 +182,9 @@ public class AppointmentService {
         // ==========================================
 
         Appointment savedAppointment =
-                appointmentRepository.save(appointment);
+                appointmentRepository.save(
+                        appointment
+                );
 
 
         // ==========================================
@@ -155,14 +247,16 @@ public class AppointmentService {
         // CHECK STATUS
         // ==========================================
 
-        if ("COMPLETED".equals(appointment.getStatus())) {
+        if ("COMPLETED".equals(
+                appointment.getStatus())) {
 
             throw new RuntimeException(
                     "Completed Appointments Cannot be Cancelled"
             );
         }
 
-        if ("CANCELLED".equals(appointment.getStatus())) {
+        if ("CANCELLED".equals(
+                appointment.getStatus())) {
 
             throw new RuntimeException(
                     "Appointment is already cancelled."
@@ -171,12 +265,14 @@ public class AppointmentService {
 
 
         // ==========================================
-        // CANCEL APPOINTMENT
+        // CANCEL
         // ==========================================
 
         appointment.setStatus("CANCELLED");
 
-        appointmentRepository.save(appointment);
+        appointmentRepository.save(
+                appointment
+        );
 
 
         // ==========================================
@@ -200,11 +296,15 @@ public class AppointmentService {
     // GET LOGGED-IN USER APPOINTMENTS
     // ==========================================
 
-    public List<Appointment> getMyAppointment(String email) {
+    public List<Appointment> getMyAppointment(
+            String email) {
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new RuntimeException("User not Found"));
+        User user =
+                userRepository.findByEmail(email)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User not Found"
+                                ));
 
         return appointmentRepository.findByUserId(
                 user.getId()
@@ -233,6 +333,104 @@ public class AppointmentService {
 
 
     // ==========================================
+    // GET STORE DOCTOR APPOINTMENTS
+    // STORE ADMIN ONLY
+    // ==========================================
+
+    public List<Appointment> getStoreDoctorAppointments(
+            Long doctorId,
+            String storeAdminEmail) {
+
+        User storeAdmin =
+                userRepository.findByEmail(
+                                storeAdminEmail
+                        )
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Store admin not found"
+                                ));
+
+
+        // ==========================================
+        // CHECK ROLE
+        // ==========================================
+
+        if (!"STORE_ADMIN".equalsIgnoreCase(
+                storeAdmin.getRole())) {
+
+            throw new RuntimeException(
+                    "Only store admins can view store appointments"
+            );
+        }
+
+
+        // ==========================================
+        // FIND STORE
+        // ==========================================
+
+        MedicalStore store =
+                medicalStoreRepository
+                        .findByAdminId(
+                                storeAdmin.getId()
+                        )
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Medical store not found"
+                                ));
+
+
+        // ==========================================
+        // FIND DOCTOR
+        // ==========================================
+
+        Doctor doctor =
+                doctorRepository.findById(
+                                doctorId
+                        )
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Doctor not found"
+                                ));
+
+
+        // ==========================================
+        // CHECK DOCTOR IS APPROVED FOR THIS STORE
+        // ==========================================
+
+        DoctorStoreRequest request =
+                doctorStoreRequestRepository
+                        .findByDoctorIdAndMedicalStoreId(
+                                doctor.getId(),
+                                store.getId()
+                        )
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "This doctor is not associated with your medical store"
+                                ));
+
+
+        if (!"APPROVED".equalsIgnoreCase(
+                request.getStatus())) {
+
+            throw new RuntimeException(
+                    "This doctor is not approved for your medical store"
+            );
+        }
+
+
+        // ==========================================
+        // GET APPOINTMENTS
+        // ==========================================
+
+        return appointmentRepository
+                .findByDoctorIdAndMedicalStoreId(
+                        doctor.getId(),
+                        store.getId()
+                );
+    }
+
+
+    // ==========================================
     // SAVE TEXT PRESCRIPTION
     // ==========================================
 
@@ -242,14 +440,19 @@ public class AppointmentService {
             String prescriptionText) {
 
         Doctor doctor =
-                doctorRepository.findByEmail(doctorEmail)
+                doctorRepository.findByEmail(
+                                doctorEmail
+                        )
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Doctor not found"
                                 ));
 
+
         Appointment appointment =
-                appointmentRepository.findById(appointmentId)
+                appointmentRepository.findById(
+                                appointmentId
+                        )
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Appointment not found"
@@ -274,7 +477,8 @@ public class AppointmentService {
         // CHECK CANCELLED
         // ==========================================
 
-        if ("CANCELLED".equals(appointment.getStatus())) {
+        if ("CANCELLED".equals(
+                appointment.getStatus())) {
 
             throw new RuntimeException(
                     "Cancelled appointment cannot have a prescription"
@@ -307,7 +511,9 @@ public class AppointmentService {
 
 
         Appointment savedAppointment =
-                appointmentRepository.save(appointment);
+                appointmentRepository.save(
+                        appointment
+                );
 
 
         // ==========================================
@@ -335,21 +541,15 @@ public class AppointmentService {
             Long id,
             String doctorEmail) {
 
-        // ==========================================
-        // FIND DOCTOR
-        // ==========================================
-
         Doctor doctor =
-                doctorRepository.findByEmail(doctorEmail)
+                doctorRepository.findByEmail(
+                                doctorEmail
+                        )
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Doctor not found"
                                 ));
 
-
-        // ==========================================
-        // FIND APPOINTMENT
-        // ==========================================
 
         Appointment appointment =
                 appointmentRepository.findById(id)
@@ -404,14 +604,16 @@ public class AppointmentService {
 
 
         // ==========================================
-        // COMPLETE APPOINTMENT
+        // COMPLETE
         // ==========================================
 
         appointment.setStatus("COMPLETED");
 
 
         Appointment savedAppointment =
-                appointmentRepository.save(appointment);
+                appointmentRepository.save(
+                        appointment
+                );
 
 
         // ==========================================
@@ -444,14 +646,19 @@ public class AppointmentService {
             MultipartFile file) {
 
         Doctor doctor =
-                doctorRepository.findByEmail(doctorEmail)
+                doctorRepository.findByEmail(
+                                doctorEmail
+                        )
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Doctor not found"
                                 ));
 
+
         Appointment appointment =
-                appointmentRepository.findById(appointmentId)
+                appointmentRepository.findById(
+                                appointmentId
+                        )
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Appointment not found"
@@ -476,7 +683,8 @@ public class AppointmentService {
         // CHECK CANCELLED
         // ==========================================
 
-        if ("CANCELLED".equals(appointment.getStatus())) {
+        if ("CANCELLED".equals(
+                appointment.getStatus())) {
 
             throw new RuntimeException(
                     "Cancelled appointment cannot have a prescription"
@@ -505,9 +713,17 @@ public class AppointmentService {
 
         if (contentType == null ||
                 (
-                        !contentType.equals("application/pdf") &&
-                                !contentType.equals("image/jpeg") &&
-                                !contentType.equals("image/png")
+                        !contentType.equals(
+                                "application/pdf"
+                        )
+                                &&
+                                !contentType.equals(
+                                        "image/jpeg"
+                                )
+                                &&
+                                !contentType.equals(
+                                        "image/png"
+                                )
                 )) {
 
             throw new RuntimeException(
@@ -553,10 +769,13 @@ public class AppointmentService {
 
 
             String filename =
-                    UUID.randomUUID() + extension;
+                    UUID.randomUUID()
+                            + extension;
 
             Path filePath =
-                    uploadDirectory.resolve(filename);
+                    uploadDirectory.resolve(
+                            filename
+                    );
 
 
             // ==========================================
@@ -624,30 +843,22 @@ public class AppointmentService {
             Long id,
             String doctorEmail) {
 
-        // ==========================================
-        // FIND DOCTOR
-        // ==========================================
-
         Doctor doctor =
-                doctorRepository.findByEmail(doctorEmail)
+                doctorRepository.findByEmail(
+                                doctorEmail
+                        )
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Doctor not found"
-                                )
-                        );
+                                ));
 
-
-        // ==========================================
-        // FIND APPOINTMENT
-        // ==========================================
 
         Appointment appointment =
                 appointmentRepository.findById(id)
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Appointment not found"
-                                )
-                        );
+                                ));
 
 
         // ==========================================
@@ -795,11 +1006,14 @@ public class AppointmentService {
             String patientEmail) {
 
         User user =
-                userRepository.findByEmail(patientEmail)
+                userRepository.findByEmail(
+                                patientEmail
+                        )
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "User Not Found"
                                 ));
+
 
         Appointment appointment =
                 appointmentRepository.findById(id)
@@ -864,7 +1078,8 @@ public class AppointmentService {
             );
         }
 
-        if (newDate.isBefore(LocalDate.now())) {
+        if (newDate.isBefore(
+                LocalDate.now())) {
 
             throw new RuntimeException(
                     "Appointment date cannot be in the past"
@@ -925,13 +1140,23 @@ public class AppointmentService {
         // UPDATE APPOINTMENT
         // ==========================================
 
-        appointment.setAppointmentDate(newDate);
-        appointment.setAppointmentTime(newTime);
-        appointment.setStatus("BOOKED");
+        appointment.setAppointmentDate(
+                newDate
+        );
+
+        appointment.setAppointmentTime(
+                newTime
+        );
+
+        appointment.setStatus(
+                "BOOKED"
+        );
 
 
         Appointment savedAppointment =
-                appointmentRepository.save(appointment);
+                appointmentRepository.save(
+                        appointment
+                );
 
 
         // ==========================================
@@ -957,19 +1182,25 @@ public class AppointmentService {
     // GET PATIENT MEDICAL HISTORY FOR DOCTOR
     // ==========================================
 
-    public List<Appointment> getPatientMedicalHistoryForDoctor(
+    public List<Appointment>
+    getPatientMedicalHistoryForDoctor(
             Long patientId,
             String doctorEmail) {
 
         Doctor doctor =
-                doctorRepository.findByEmail(doctorEmail)
+                doctorRepository.findByEmail(
+                                doctorEmail
+                        )
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Doctor Not Found"
                                 ));
 
+
         User patient =
-                userRepository.findById(patientId)
+                userRepository.findById(
+                                patientId
+                        )
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Patient Not Found"
@@ -981,10 +1212,11 @@ public class AppointmentService {
         // ==========================================
 
         boolean hasAppointment =
-                appointmentRepository.existsByDoctorIdAndUserId(
-                        doctor.getId(),
-                        patient.getId()
-                );
+                appointmentRepository
+                        .existsByDoctorIdAndUserId(
+                                doctor.getId(),
+                                patient.getId()
+                        );
 
         if (!hasAppointment) {
 

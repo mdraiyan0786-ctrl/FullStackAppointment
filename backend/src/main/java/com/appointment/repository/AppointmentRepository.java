@@ -52,4 +52,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment,Long> {
             Long doctorId,
             Long userId
     );
+
+    List<Appointment> findByDoctorIdAndMedicalStoreId(
+            Long doctorId,
+            Long medicalStoreId
+    );
 }

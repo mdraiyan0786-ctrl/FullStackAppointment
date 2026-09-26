@@ -43,6 +43,11 @@ public class Appointment {
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
 
+
+    @ManyToOne
+    @JoinColumn(name = "medical_store_id")
+    private MedicalStore medicalStore;
+
     // =========================
     // PRESCRIPTION
     // =========================
@@ -154,5 +159,13 @@ public class Appointment {
 
     public void setPrescriptionFileUrl(String prescriptionFileUrl) {
         this.prescriptionFileUrl = prescriptionFileUrl;
+    }
+
+    public MedicalStore getMedicalStore() {
+        return medicalStore;
+    }
+
+    public void setMedicalStore(MedicalStore medicalStore) {
+        this.medicalStore = medicalStore;
     }
 }

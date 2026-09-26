@@ -67,10 +67,25 @@ public class AppointmentController {
     }
 
     // ==========================================
+// GET DOCTOR APPOINTMENTS
+// ==========================================
+
+    @GetMapping("/doctor")
+    public ResponseEntity<List<Appointment>> getDoctorAppointments(
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return ResponseEntity.ok(
+                appointmentService.getDoctorAppointments(email)
+        );
+    }
+
+    // ==========================================
     // GET APPOINTMENT BY ID
     // ==========================================
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     public Appointment getAppointmentById(
             @PathVariable Long id) {
 
@@ -94,15 +109,47 @@ public class AppointmentController {
     // GET DOCTOR APPOINTMENTS
     // ==========================================
 
-    @GetMapping("/doctor")
-    public ResponseEntity<List<Appointment>> getDoctorAppointments(
+
+    @PreAuthorize("hasRole('STORE_ADMIN')")
+    @GetMapping("/store/doctor/{doctorId}")
+    public ResponseEntity<?> getStoreDoctorAppointments(
+            @PathVariable Long doctorId,
             Authentication authentication) {
 
-        String email = authentication.getName();
+        try {
 
-        return ResponseEntity.ok(
-                appointmentService.getDoctorAppointments(email)
-        );
+            String storeAdminEmail =
+                    authentication.getName();
+
+            List<Appointment> appointments =
+                    appointmentService.getStoreDoctorAppointments(
+                            doctorId,
+                            storeAdminEmail
+                    );
+
+            // Never expose passwords
+            for (Appointment appointment : appointments) {
+
+                if (appointment.getUser() != null) {
+                    appointment.getUser().setPassword(null);
+                }
+
+                if (appointment.getDoctor() != null) {
+                    appointment.getDoctor().setPassword(null);
+                }
+            }
+
+            return ResponseEntity.ok(appointments);
+
+        } catch (RuntimeException e) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of(
+                            "message",
+                            e.getMessage()
+                    ));
+        }
     }
 
     // ==========================================
