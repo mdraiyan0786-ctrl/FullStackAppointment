@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+
 import Navbar from "../../component/Navbar/Navbar";
 import Footer from "../../component/Footer/Footer";
 import "./Appointment.css";
@@ -9,8 +10,14 @@ function Appointment() {
 
     const navigate = useNavigate();
     const location = useLocation();
+    const [searchParams] = useSearchParams();
 
-    const doctor = location.state?.doctor;
+    const doctorId = searchParams.get("doctorId");
+    const storeId = searchParams.get("storeId");
+
+    const [doctor, setDoctor] = useState(
+        location.state?.doctor || null
+    );
 
     const [formData, setFormData] = useState({
         patientName: "",
@@ -21,10 +28,63 @@ function Appointment() {
         time: "",
     });
 
+    const [loadingDoctor, setLoadingDoctor] = useState(false);
 
-    // =========================
+
+    // ==========================================
+    // FETCH DOCTOR
+    // ==========================================
+
+    useEffect(() => {
+
+        const fetchDoctor = async () => {
+
+            // If doctor already came through location.state
+            if (location.state?.doctor) {
+                setDoctor(location.state.doctor);
+                return;
+            }
+
+            // If doctorId is available in URL
+            if (!doctorId) {
+                return;
+            }
+
+            try {
+
+                setLoadingDoctor(true);
+
+                const response =
+                    await api.get(
+                        `/doctors/${doctorId}`
+                    );
+
+                setDoctor(response.data);
+
+            } catch (error) {
+
+                console.error(
+                    "Failed to load doctor:",
+                    error
+                );
+
+                alert("Unable to load doctor details.");
+
+            } finally {
+
+                setLoadingDoctor(false);
+
+            }
+        };
+
+        fetchDoctor();
+
+    }, [doctorId, location.state]);
+
+
+    // ==========================================
     // HANDLE INPUT CHANGES
-    // =========================
+    // ==========================================
 
     const handleChange = (e) => {
 
@@ -36,9 +96,9 @@ function Appointment() {
     };
 
 
-    // =========================
+    // ==========================================
     // BOOK APPOINTMENT
-    // =========================
+    // ==========================================
 
     const handleSubmit = async (e) => {
 
@@ -53,14 +113,18 @@ function Appointment() {
 
         if (!formData.date) {
 
-            alert("Please select an appointment date.");
+            alert(
+                "Please select an appointment date."
+            );
 
             return;
         }
 
         if (!formData.time) {
 
-            alert("Please select an appointment time.");
+            alert(
+                "Please select an appointment time."
+            );
 
             return;
         }
@@ -93,8 +157,26 @@ function Appointment() {
                 doctor: {
                     id: doctor.id,
                 },
+
             };
 
+
+            // ==========================================
+            // ADD MEDICAL STORE
+            // ==========================================
+
+            if (storeId) {
+
+                appointment.medicalStore = {
+                    id: parseInt(storeId),
+                };
+
+            }
+
+
+            // ==========================================
+            // SEND BOOKING REQUEST
+            // ==========================================
 
             const response =
                 await api.post(
@@ -158,14 +240,48 @@ function Appointment() {
 
 
             alert(message);
+
         }
+
     };
 
+
+    // ==========================================
+    // LOADING DOCTOR
+    // ==========================================
+
+    if (loadingDoctor) {
+
+        return (
+            <>
+                <Navbar />
+
+                <div className="appointment-container">
+
+                    <div className="appointment-card">
+
+                        <h2>
+                            Loading doctor...
+                        </h2>
+
+                    </div>
+
+                </div>
+
+                <Footer />
+            </>
+        );
+
+    }
+
+
+    // ==========================================
+    // PAGE
+    // ==========================================
 
     return (
         <>
             <Navbar />
-
 
             <div className="appointment-container">
 
@@ -176,9 +292,9 @@ function Appointment() {
                     </h1>
 
 
-                    {/* =========================
+                    {/* ==========================================
                         SELECTED DOCTOR
-                    ========================= */}
+                    ========================================== */}
 
                     {doctor && (
 
@@ -221,12 +337,22 @@ function Appointment() {
                     )}
 
 
+                    {!doctor && (
+
+                        <p>
+                            Doctor information could not be
+                            loaded.
+                        </p>
+
+                    )}
+
+
                     <form onSubmit={handleSubmit}>
 
 
-                        {/* =========================
+                        {/* ==========================================
                             PATIENT NAME
-                        ========================= */}
+                        ========================================== */}
 
                         <div className="form-group">
 
@@ -249,9 +375,9 @@ function Appointment() {
                         </div>
 
 
-                        {/* =========================
+                        {/* ==========================================
                             AGE
-                        ========================= */}
+                        ========================================== */}
 
                         <div className="form-group">
 
@@ -275,9 +401,9 @@ function Appointment() {
                         </div>
 
 
-                        {/* =========================
+                        {/* ==========================================
                             GENDER
-                        ========================= */}
+                        ========================================== */}
 
                         <div className="form-group">
 
@@ -317,9 +443,9 @@ function Appointment() {
                         </div>
 
 
-                        {/* =========================
+                        {/* ==========================================
                             PHONE
-                        ========================= */}
+                        ========================================== */}
 
                         <div className="form-group">
 
@@ -342,9 +468,9 @@ function Appointment() {
                         </div>
 
 
-                        {/* =========================
+                        {/* ==========================================
                             DATE
-                        ========================= */}
+                        ========================================== */}
 
                         <div className="form-group">
 
@@ -367,9 +493,9 @@ function Appointment() {
                         </div>
 
 
-                        {/* =========================
+                        {/* ==========================================
                             TIME
-                        ========================= */}
+                        ========================================== */}
 
                         <div className="form-group">
 
@@ -392,24 +518,37 @@ function Appointment() {
                         </div>
 
 
-                        {/* =========================
+                        {/* ==========================================
+                            STORE INFORMATION
+                        ========================================== */}
+
+                        {storeId && (
+
+                            <p>
+                                Appointment at selected
+                                medical store.
+                            </p>
+
+                        )}
+
+
+                        {/* ==========================================
                             CONFIRM BUTTON
-                        ========================= */}
+                        ========================================== */}
 
                         <button
                             type="submit"
                             className="confirm-btn"
+                            disabled={!doctor}
                         >
                             Confirm Appointment
                         </button>
-
 
                     </form>
 
                 </div>
 
             </div>
-
 
             <Footer />
 

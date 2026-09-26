@@ -781,7 +781,6 @@ function DoctorDashboard() {
                                             </span>
 
                                         </div>
-
                                     )
                                 )}
 
@@ -828,6 +827,17 @@ function DoctorDashboard() {
                                 }
                             >
                                 👤 My Profile
+                            </button>
+
+
+                            <button
+                                onClick={() =>
+                                    navigate(
+                                        "/private-chambers"
+                                    )
+                                }
+                            >
+                                🏥 Private Chambers
                             </button>
 
                         </div>
@@ -953,7 +963,6 @@ function DoctorDashboard() {
                                             </span>
 
                                         </div>
-
                                     )
                                 )}
 

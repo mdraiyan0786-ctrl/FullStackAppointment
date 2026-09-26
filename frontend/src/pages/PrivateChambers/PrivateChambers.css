@@ -1,0 +1,327 @@
+.private-chambers-page {
+    min-height: 100vh;
+    background: #f5f7fb;
+    padding: 50px 20px;
+}
+
+.private-chambers-container {
+    max-width: 1050px;
+    margin: 0 auto;
+}
+
+/* HEADER */
+
+.private-chambers-header {
+    margin-bottom: 30px;
+}
+
+.private-chambers-header h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    color: #1f2937;
+}
+
+.private-chambers-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 15px;
+}
+
+
+/* FORM CARD */
+
+.chamber-form-card {
+    background: white;
+    padding: 28px;
+    border-radius: 14px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.06);
+    margin-bottom: 25px;
+}
+
+.chamber-form-card h2 {
+    margin: 0 0 22px;
+    color: #1f2937;
+    font-size: 21px;
+}
+
+.chamber-form {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr auto;
+    gap: 15px;
+    align-items: end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-group input {
+    height: 44px;
+    padding: 0 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.form-group input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.add-chamber-btn {
+    height: 44px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+.add-chamber-btn:hover {
+    background: #1d4ed8;
+}
+
+.add-chamber-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* MESSAGES */
+
+.success-message {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.error-message {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+
+/* SECTION */
+
+.chambers-section {
+    margin-top: 30px;
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.section-title h2 {
+    margin: 0;
+    font-size: 22px;
+    color: #1f2937;
+}
+
+.section-title span {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+
+/* GRID */
+
+.chambers-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+
+/* CHAMBER CARD */
+
+.chamber-card {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.chamber-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.09);
+}
+
+.chamber-card-header {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #eef0f4;
+}
+
+.chamber-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    border-radius: 10px;
+    font-size: 24px;
+}
+
+.chamber-card-header h3 {
+    margin: 0 0 4px;
+    color: #1f2937;
+    font-size: 18px;
+}
+
+.chamber-card-header span {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+
+/* DETAILS */
+
+.chamber-details {
+    padding: 18px 0;
+}
+
+.detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 13px;
+}
+
+.detail-row:last-child {
+    margin-bottom: 0;
+}
+
+.detail-icon {
+    width: 22px;
+    flex-shrink: 0;
+}
+
+.detail-row p {
+    margin: 0;
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* ACTIONS */
+
+.chamber-actions {
+    border-top: 1px solid #eef0f4;
+    padding-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.delete-chamber-btn {
+    border: 1px solid #fecaca;
+    background: #fff;
+    color: #dc2626;
+    padding: 8px 16px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.delete-chamber-btn:hover {
+    background: #fef2f2;
+}
+
+
+/* EMPTY STATE */
+
+.empty-chambers {
+    background: white;
+    border-radius: 14px;
+    padding: 55px 25px;
+    text-align: center;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+}
+
+.empty-icon {
+    font-size: 45px;
+    margin-bottom: 12px;
+}
+
+.empty-chambers h3 {
+    margin: 0 0 8px;
+    color: #374151;
+}
+
+.empty-chambers p {
+    max-width: 450px;
+    margin: 0 auto;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+
+    .chamber-form {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .add-chamber-btn {
+        width: 100%;
+    }
+
+    .chambers-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .private-chambers-page {
+        padding: 30px 15px;
+    }
+
+    .private-chambers-header h1 {
+        font-size: 27px;
+    }
+
+    .chamber-form {
+        grid-template-columns: 1fr;
+    }
+
+    .chamber-form-card {
+        padding: 20px;
+    }
+}

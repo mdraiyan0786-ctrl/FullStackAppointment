@@ -6,6 +6,8 @@ import Register from "./pages/Register/Register";
 import About from "./pages/About/About";
 import Contact from "./pages/Contact/Contact";
 
+import StoreDoctorAppointments from "./pages/StoreAdmin/StoreDoctorAppointments";
+
 import Doctors from "./pages/Doctors/Doctors";
 import DoctorProfile from "./pages/DoctorProfile/DoctorProfile";
 
@@ -35,6 +37,8 @@ import MedicalStoreRegister
     from "./pages/MedicalStoreRegister/MedicalStoreRegister";
 
 import MedicalStoreLogin from "./pages/MedicalStoreLogin/MedicalStoreLogin";    
+
+import PrivateChambers from "./pages/PrivateChambers/PrivateChambers";
 
 
 function App() {
@@ -204,6 +208,16 @@ function App() {
                 <Route
                     path="/medical-store-login"
                     element={<MedicalStoreLogin />}
+                />
+
+                <Route
+                    path="/private-chambers"
+                    element={<PrivateChambers />}
+                />
+
+                <Route
+                    path="/store-admin/doctor/:doctorId/appointments"
+                    element={<StoreDoctorAppointments />}
                 />
 
             </Routes>
