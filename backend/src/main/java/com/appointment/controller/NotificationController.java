@@ -7,6 +7,8 @@ import com.appointment.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import java.util.Map;
@@ -74,6 +76,56 @@ public class NotificationController {
                 id,
                 user.getId()
         );
+        return ResponseEntity.ok(
+                "Notification marked as read"
+        );
+    }
+    @GetMapping("/store-admin")
+    @PreAuthorize("hasRole('STORE_ADMIN')")
+    public ResponseEntity<List<Notification>> getStoreAdminNotifications(
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        return ResponseEntity.ok(
+                notificationService.getMyNotifications(user.getId())
+        );
+    }
+
+    @GetMapping("/store-admin/unread-count")
+    @PreAuthorize("hasRole('STORE_ADMIN')")
+    public ResponseEntity<Long> getStoreAdminUnreadCount(
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        return ResponseEntity.ok(
+                notificationService.getUnreadCount(user.getId())
+        );
+    }
+
+    @PutMapping("/store-admin/{id}/read")
+    @PreAuthorize("hasRole('STORE_ADMIN')")
+    public ResponseEntity<String> markStoreAdminNotificationAsRead(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        notificationService.markAsRead(id, user.getId());
+
         return ResponseEntity.ok(
                 "Notification marked as read"
         );

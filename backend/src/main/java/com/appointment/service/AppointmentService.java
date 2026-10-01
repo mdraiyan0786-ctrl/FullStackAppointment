@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
@@ -188,6 +189,31 @@ public class AppointmentService {
 
 
         // ==========================================
+        // NOTIFY MEDICAL STORE ADMIN
+        // ==========================================
+
+        if (medicalStore != null &&
+                medicalStore.getAdmin() != null) {
+
+            notificationService.createNotification(
+                    medicalStore.getAdmin(),
+                    "New appointment booked at "
+                            + medicalStore.getName()
+                            + ". Patient: "
+                            + appointment.getPatientName()
+                            + ", Phone: "
+                            + appointment.getPhone()
+                            + ", Doctor: "
+                            + doctor.getName()
+                            + ", Date: "
+                            + appointment.getAppointmentDate()
+                            + ", Time: "
+                            + appointment.getAppointmentTime()
+            );
+        }
+
+
+        // ==========================================
         // NOTIFY PATIENT
         // ==========================================
 
@@ -204,7 +230,6 @@ public class AppointmentService {
 
         return savedAppointment;
     }
-
 
     // ==========================================
     // GET ALL APPOINTMENTS
@@ -839,22 +864,26 @@ public class AppointmentService {
     // MARK APPOINTMENT AS ABSENT
     // ==========================================
 
-    public Appointment markAbsent(
-            Long id,
-            String doctorEmail) {
+    public Appointment markAbsent(Long appointmentId, String doctorEmail) {
+
+        // ==========================================
+        // FIND DOCTOR
+        // ==========================================
 
         Doctor doctor =
-                doctorRepository.findByEmail(
-                                doctorEmail
-                        )
+                doctorRepository.findByEmail(doctorEmail)
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Doctor not found"
                                 ));
 
 
+        // ==========================================
+        // FIND APPOINTMENT
+        // ==========================================
+
         Appointment appointment =
-                appointmentRepository.findById(id)
+                appointmentRepository.findById(appointmentId)
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Appointment not found"
@@ -866,29 +895,20 @@ public class AppointmentService {
         // ==========================================
 
         if (appointment.getDoctor() == null ||
-                !appointment.getDoctor()
-                        .getId()
+                !appointment.getDoctor().getId()
                         .equals(doctor.getId())) {
 
             throw new RuntimeException(
-                    "You are not authorized to modify this appointment"
+                    "You are not authorized to update this appointment"
             );
         }
 
 
         // ==========================================
-        // CHECK STATUS
+        // CHECK CURRENT STATUS
         // ==========================================
 
-        if ("CANCELLED".equals(
-                appointment.getStatus())) {
-
-            throw new RuntimeException(
-                    "Cancelled appointment cannot be marked absent"
-            );
-        }
-
-        if ("COMPLETED".equals(
+        if ("COMPLETED".equalsIgnoreCase(
                 appointment.getStatus())) {
 
             throw new RuntimeException(
@@ -896,7 +916,15 @@ public class AppointmentService {
             );
         }
 
-        if ("ABSENT".equals(
+        if ("CANCELLED".equalsIgnoreCase(
+                appointment.getStatus())) {
+
+            throw new RuntimeException(
+                    "Cancelled appointment cannot be marked absent"
+            );
+        }
+
+        if ("ABSENT".equalsIgnoreCase(
                 appointment.getStatus())) {
 
             throw new RuntimeException(
@@ -909,33 +937,17 @@ public class AppointmentService {
         // CHECK APPOINTMENT TIME
         // ==========================================
 
-        LocalDate today =
-                LocalDate.now();
+        LocalDateTime appointmentDateTime =
+                LocalDateTime.of(
+                        appointment.getAppointmentDate(),
+                        appointment.getAppointmentTime()
+                );
 
-        LocalTime now =
-                LocalTime.now();
-
-        LocalDate appointmentDate =
-                appointment.getAppointmentDate();
-
-        LocalTime appointmentTime =
-                appointment.getAppointmentTime();
-
-
-        boolean appointmentPassed =
-                appointmentDate.isBefore(today)
-                        ||
-                        (
-                                appointmentDate.isEqual(today)
-                                        &&
-                                        appointmentTime.isBefore(now)
-                        );
-
-
-        if (!appointmentPassed) {
+        if (LocalDateTime.now()
+                .isBefore(appointmentDateTime)) {
 
             throw new RuntimeException(
-                    "Patient can only be marked absent after the appointment time"
+                    "Appointment cannot be marked absent before the appointment time"
             );
         }
 
@@ -946,27 +958,37 @@ public class AppointmentService {
 
         appointment.setStatus("ABSENT");
 
-
         Appointment savedAppointment =
-                appointmentRepository.save(
-                        appointment
-                );
+                appointmentRepository.save(appointment);
 
 
         // ==========================================
-        // NOTIFY PATIENT
+        // NOTIFY MEDICAL STORE ADMIN
         // ==========================================
 
-        notificationService.createNotification(
-                appointment.getUser(),
-                "Your appointment with "
-                        + appointment.getDoctor().getName()
-                        + " on "
-                        + appointment.getAppointmentDate()
-                        + " at "
-                        + appointment.getAppointmentTime()
-                        + " was marked as absent."
-        );
+        MedicalStore medicalStore =
+                appointment.getMedicalStore();
+
+        if (medicalStore != null &&
+                medicalStore.getAdmin() != null) {
+
+            notificationService.createNotification(
+                    medicalStore.getAdmin(),
+
+                    "Patient "
+                            + appointment.getPatientName()
+                            + " was marked absent for Dr. "
+                            + doctor.getName()
+                            + "'s appointment at "
+                            + medicalStore.getName()
+                            + ". Phone: "
+                            + appointment.getPhone()
+                            + ", Date: "
+                            + appointment.getAppointmentDate()
+                            + ", Time: "
+                            + appointment.getAppointmentTime()
+            );
+        }
 
 
         return savedAppointment;

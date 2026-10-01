@@ -17,15 +17,19 @@ public class DoctorStoreRequestService {
     private final DoctorStoreRequestRepository requestRepository;
     private final DoctorRepository doctorRepository;
     private final MedicalStoreRepository medicalStoreRepository;
+    //private final NotificationService notificationService;
+    private final DoctorNotificationService doctorNotificationService;
 
     public DoctorStoreRequestService(
             DoctorStoreRequestRepository requestRepository,
             DoctorRepository doctorRepository,
-            MedicalStoreRepository medicalStoreRepository) {
+            MedicalStoreRepository medicalStoreRepository,
+            DoctorNotificationService doctorNotificationService) {
 
         this.requestRepository = requestRepository;
         this.doctorRepository = doctorRepository;
         this.medicalStoreRepository = medicalStoreRepository;
+        this.doctorNotificationService = doctorNotificationService;
     }
 
     // ==========================================
@@ -152,6 +156,18 @@ public class DoctorStoreRequestService {
 // ACCEPT REQUEST
 // ==========================================
 
+    // ==========================================
+// ACCEPT REQUEST
+// ==========================================
+
+    // ==========================================
+// ACCEPT REQUEST
+// ==========================================
+
+    // ==========================================
+// ACCEPT REQUEST
+// ==========================================
+
     public DoctorStoreRequest approveRequest(
             Long requestId,
             Long adminId) {
@@ -166,7 +182,11 @@ public class DoctorStoreRequestService {
         MedicalStore medicalStore =
                 request.getMedicalStore();
 
-        // Make sure this store belongs to the logged-in admin
+
+        // ==========================================
+        // CHECK STORE ADMIN
+        // ==========================================
+
         if (medicalStore.getAdmin() == null ||
                 !medicalStore.getAdmin()
                         .getId()
@@ -177,7 +197,11 @@ public class DoctorStoreRequestService {
             );
         }
 
-        // Only pending requests can be approved
+
+        // ==========================================
+        // CHECK STATUS
+        // ==========================================
+
         if (!"PENDING".equalsIgnoreCase(
                 request.getStatus())) {
 
@@ -186,13 +210,44 @@ public class DoctorStoreRequestService {
             );
         }
 
+
+        // ==========================================
+        // APPROVE
+        // ==========================================
+
         request.setStatus("APPROVED");
 
-        return requestRepository.save(request);
+        DoctorStoreRequest savedRequest =
+                requestRepository.save(request);
+
+
+        // ==========================================
+        // NOTIFY DOCTOR
+        // ==========================================
+
+        Doctor doctor =
+                request.getDoctor();
+
+        if (doctor != null) {
+
+            doctorNotificationService.createNotification(
+                    doctor,
+                    "Your request to work at "
+                            + medicalStore.getName()
+                            + " has been approved."
+            );
+        }
+
+
+        return savedRequest;
     }
 
 
 // ==========================================
+// REJECT REQUEST
+// ==========================================
+
+    // ==========================================
 // REJECT REQUEST
 // ==========================================
 
@@ -210,7 +265,11 @@ public class DoctorStoreRequestService {
         MedicalStore medicalStore =
                 request.getMedicalStore();
 
-        // Make sure this store belongs to the logged-in admin
+
+        // ==========================================
+        // CHECK STORE ADMIN
+        // ==========================================
+
         if (medicalStore.getAdmin() == null ||
                 !medicalStore.getAdmin()
                         .getId()
@@ -221,7 +280,11 @@ public class DoctorStoreRequestService {
             );
         }
 
-        // Only pending requests can be rejected
+
+        // ==========================================
+        // CHECK STATUS
+        // ==========================================
+
         if (!"PENDING".equalsIgnoreCase(
                 request.getStatus())) {
 
@@ -230,8 +293,35 @@ public class DoctorStoreRequestService {
             );
         }
 
+
+        // ==========================================
+        // REJECT
+        // ==========================================
+
         request.setStatus("REJECTED");
 
-        return requestRepository.save(request);
+        DoctorStoreRequest savedRequest =
+                requestRepository.save(request);
+
+
+        // ==========================================
+        // NOTIFY DOCTOR
+        // ==========================================
+
+        Doctor doctor =
+                request.getDoctor();
+
+        if (doctor != null) {
+
+            doctorNotificationService.createNotification(
+                    doctor,
+                    "Your request to work at "
+                            + medicalStore.getName()
+                            + " has been rejected."
+            );
+        }
+
+
+        return savedRequest;
     }
 }
