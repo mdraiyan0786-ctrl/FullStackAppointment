@@ -250,3 +250,61 @@
     }
 
 }
+/* ==========================================
+   DOCTOR STORE REQUEST
+========================================== */
+
+.store-request-btn {
+    margin-top: 18px;
+
+    padding: 11px 20px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.store-request-btn:hover:not(:disabled) {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.store-request-btn:disabled {
+    cursor: default;
+    opacity: 0.85;
+}
+
+.store-request-btn.pending {
+    background: #f59e0b;
+}
+
+.store-request-btn.approved {
+    background: #16a34a;
+}
+
+.store-request-success {
+    margin-top: 10px;
+
+    color: #15803d;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.store-request-error {
+    margin-top: 10px;
+
+    color: #dc2626;
+
+    font-size: 14px;
+    font-weight: 600;
+}

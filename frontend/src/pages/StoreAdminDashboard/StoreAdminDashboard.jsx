@@ -16,6 +16,10 @@ function StoreAdminDashboard() {
     const [store, setStore] = useState(null);
     const [doctors, setDoctors] = useState([]);
 
+    const [notifications, setNotifications] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [showNotifications, setShowNotifications] = useState(false);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -89,6 +93,126 @@ function StoreAdminDashboard() {
 
 
     // ==========================================
+    // FETCH NOTIFICATIONS
+    // ==========================================
+
+    const fetchNotifications = async () => {
+
+        try {
+
+            const response =
+                await api.get(
+                    "/notifications/store-admin"
+                );
+
+            setNotifications(
+                Array.isArray(response.data)
+                    ? response.data
+                    : []
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Failed to load notifications:",
+                error
+            );
+
+            setNotifications([]);
+
+        }
+    };
+
+
+    // ==========================================
+    // FETCH UNREAD COUNT
+    // ==========================================
+
+    const fetchUnreadCount = async () => {
+
+        try {
+
+            const response =
+                await api.get(
+                    "/notifications/store-admin/unread-count"
+                );
+
+            setUnreadCount(
+                Number(response.data) || 0
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Failed to load unread notification count:",
+                error
+            );
+
+            setUnreadCount(0);
+
+        }
+    };
+
+
+    // ==========================================
+    // MARK NOTIFICATION AS READ
+    // ==========================================
+
+    const markAsRead = async (notificationId) => {
+
+        try {
+
+            await api.put(
+                `/notifications/store-admin/${notificationId}/read`
+            );
+
+            setNotifications((previous) =>
+                previous.map((notification) =>
+                    notification.id === notificationId
+                        ? {
+                            ...notification,
+                            read: true
+                        }
+                        : notification
+                )
+            );
+
+            setUnreadCount((previous) =>
+                Math.max(0, previous - 1)
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Failed to mark notification as read:",
+                error
+            );
+
+        }
+    };
+
+
+    // ==========================================
+    // TOGGLE NOTIFICATIONS
+    // ==========================================
+
+    const toggleNotifications = async () => {
+
+        const nextState = !showNotifications;
+
+        setShowNotifications(nextState);
+
+        if (nextState) {
+
+            await fetchNotifications();
+            await fetchUnreadCount();
+
+        }
+
+    };
+
+
+    // ==========================================
     // INITIAL LOAD
     // ==========================================
 
@@ -112,6 +236,9 @@ function StoreAdminDashboard() {
 
                 }
 
+                await fetchNotifications();
+                await fetchUnreadCount();
+
             } catch (error) {
 
                 setError(
@@ -130,6 +257,28 @@ function StoreAdminDashboard() {
         loadDashboard();
 
     }, []);
+
+
+    // ==========================================
+    // AUTO REFRESH NOTIFICATIONS
+    // ==========================================
+
+    useEffect(() => {
+
+        const interval =
+            setInterval(() => {
+
+                fetchUnreadCount();
+
+                if (showNotifications) {
+                    fetchNotifications();
+                }
+
+            }, 30000);
+
+        return () => clearInterval(interval);
+
+    }, [showNotifications]);
 
 
     // ==========================================
@@ -223,6 +372,140 @@ function StoreAdminDashboard() {
                             <p>
                                 Manage your store and doctors
                             </p>
+
+                        </div>
+
+
+                        {/* ==========================================
+                            NOTIFICATIONS
+                        ========================================== */}
+
+                        <div className="store-notification-wrapper">
+
+                            <button
+                                className="store-notification-btn"
+                                onClick={toggleNotifications}
+                            >
+
+                                🔔
+
+                                {unreadCount > 0 && (
+
+                                    <span className="store-notification-badge">
+                                        {unreadCount > 99
+                                            ? "99+"
+                                            : unreadCount}
+                                    </span>
+
+                                )}
+
+                            </button>
+
+
+                            {showNotifications && (
+
+                                <div className="store-notification-dropdown">
+
+                                    <div className="store-notification-header">
+
+                                        <h3>
+                                            Notifications
+                                        </h3>
+
+                                        {unreadCount > 0 && (
+
+                                            <span>
+                                                {unreadCount} unread
+                                            </span>
+
+                                        )}
+
+                                    </div>
+
+
+                                    {notifications.length === 0 ? (
+
+                                        <div className="no-store-notifications">
+
+                                            <div>
+                                                🔔
+                                            </div>
+
+                                            <p>
+                                                No notifications
+                                            </p>
+
+                                        </div>
+
+                                    ) : (
+
+                                        <div className="store-notification-list">
+
+                                            {notifications.map(
+                                                (notification) => (
+
+                                                    <div
+                                                        key={
+                                                            notification.id
+                                                        }
+                                                        className={
+                                                            notification.read
+                                                                ? "store-notification-item"
+                                                                : "store-notification-item unread"
+                                                        }
+                                                        onClick={() => {
+
+                                                            if (
+                                                                !notification.read
+                                                            ) {
+
+                                                                markAsRead(
+                                                                    notification.id
+                                                                );
+
+                                                            }
+
+                                                        }}
+                                                    >
+
+                                                        <div className="notification-icon">
+                                                            🔔
+                                                        </div>
+
+                                                        <div className="notification-content">
+
+                                                            <p>
+                                                                {
+                                                                    notification.message
+                                                                }
+                                                            </p>
+
+                                                            {notification.createdAt && (
+
+                                                                <small>
+                                                                    {
+                                                                        new Date(
+                                                                            notification.createdAt
+                                                                        ).toLocaleString()
+                                                                    }
+                                                                </small>
+
+                                                            )}
+
+                                                        </div>
+
+                                                    </div>
+
+                                                )
+                                            )}
+
+                                        </div>
+
+                                    )}
+
+                                </div>
+
+                            )}
 
                         </div>
 

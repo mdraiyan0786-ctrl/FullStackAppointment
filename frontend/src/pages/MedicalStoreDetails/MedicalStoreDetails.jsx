@@ -16,6 +16,11 @@ function MedicalStoreDetails() {
     const [doctorSchedules, setDoctorSchedules] = useState([]);
     const [approvedDoctors, setApprovedDoctors] = useState([]);
 
+    const [myRequest, setMyRequest] = useState(null);
+    const [requestLoading, setRequestLoading] = useState(false);
+    const [requestMessage, setRequestMessage] = useState("");
+    const [requestError, setRequestError] = useState("");
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -51,7 +56,9 @@ function MedicalStoreDetails() {
                 setStore(storeResponse.data);
 
 
+                // ==========================================
                 // SCHEDULES
+                // ==========================================
 
                 if (
                     Array.isArray(
@@ -70,7 +77,9 @@ function MedicalStoreDetails() {
                 }
 
 
+                // ==========================================
                 // APPROVED DOCTORS
+                // ==========================================
 
                 if (
                     Array.isArray(
@@ -111,6 +120,191 @@ function MedicalStoreDetails() {
         fetchStoreDetails();
 
     }, [id]);
+
+
+    // ==========================================
+    // FETCH DOCTOR'S REQUEST FOR THIS STORE
+    // ==========================================
+
+    useEffect(() => {
+
+        const fetchMyRequest = async () => {
+
+            // Only doctors need the request functionality
+            const doctorToken =
+                localStorage.getItem("doctorToken");
+
+            if (!doctorToken) {
+                return;
+            }
+
+            try {
+
+                const response =
+                    await api.get(
+                        "/doctor-store-requests/my"
+                    );
+
+                if (
+                    Array.isArray(response.data)
+                ) {
+
+                    const request =
+                        response.data.find(
+                            (item) =>
+                                item.medicalStore?.id ===
+                                Number(id)
+                        );
+
+                    setMyRequest(
+                        request || null
+                    );
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Failed to load store request:",
+                    error
+                );
+
+            }
+
+        };
+
+        fetchMyRequest();
+
+    }, [id]);
+
+
+    // ==========================================
+    // SEND REQUEST
+    // ==========================================
+
+    const handleSendRequest = async () => {
+
+        setRequestLoading(true);
+        setRequestMessage("");
+        setRequestError("");
+
+        try {
+
+            const response =
+                await api.post(
+                    `/doctor-store-requests/${id}`
+                );
+
+            setMyRequest(
+                response.data
+            );
+
+            setRequestMessage(
+                "Request sent successfully."
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Failed to send store request:",
+                error
+            );
+
+            setRequestError(
+                error.response?.data?.message ||
+                "Failed to send request."
+            );
+
+        } finally {
+
+            setRequestLoading(false);
+
+        }
+
+    };
+
+
+    // ==========================================
+    // REQUEST BUTTON
+    // ==========================================
+
+    const renderRequestButton = () => {
+
+        // Don't show request controls to patients
+        const doctorToken =
+            localStorage.getItem("doctorToken");
+
+        if (!doctorToken) {
+            return null;
+        }
+
+
+        // ==========================================
+        // REQUEST PENDING
+        // ==========================================
+
+        if (
+            myRequest &&
+            myRequest.status?.toUpperCase() ===
+            "PENDING"
+        ) {
+
+            return (
+                <button
+                    className="store-request-btn pending"
+                    disabled
+                >
+                    ⏳ Request Pending
+                </button>
+            );
+
+        }
+
+
+        // ==========================================
+        // REQUEST APPROVED
+        // ==========================================
+
+        if (
+            myRequest &&
+            myRequest.status?.toUpperCase() ===
+            "APPROVED"
+        ) {
+
+            return (
+                <button
+                    className="store-request-btn approved"
+                    disabled
+                >
+                    ✓ Already Associated
+                </button>
+            );
+
+        }
+
+
+        // ==========================================
+        // REQUEST REJECTED / NO REQUEST
+        // ==========================================
+
+        return (
+            <button
+                className="store-request-btn"
+                onClick={handleSendRequest}
+                disabled={requestLoading}
+            >
+
+                {requestLoading
+                    ? "Sending..."
+                    : myRequest?.status?.toUpperCase() ===
+                      "REJECTED"
+                        ? "↻ Send Request Again"
+                        : "📩 Send Request"}
+
+            </button>
+        );
+
+    };
 
 
     // ==========================================
@@ -179,7 +373,9 @@ function MedicalStoreDetails() {
     const doctorMap = {};
 
 
-    // First add all approved doctors
+    // ==========================================
+    // FIRST ADD ALL APPROVED DOCTORS
+    // ==========================================
 
     approvedDoctors.forEach((request) => {
 
@@ -198,7 +394,9 @@ function MedicalStoreDetails() {
     });
 
 
-    // Then add schedules
+    // ==========================================
+    // THEN ADD SCHEDULES
+    // ==========================================
 
     doctorSchedules.forEach((schedule) => {
 
@@ -294,6 +492,29 @@ function MedicalStoreDetails() {
 
                         )}
 
+
+                        {/* ==========================================
+                            DOCTOR STORE REQUEST
+                        ========================================== */}
+
+                        {renderRequestButton()}
+
+                        {requestMessage && (
+
+                            <p className="store-request-success">
+                                ✓ {requestMessage}
+                            </p>
+
+                        )}
+
+                        {requestError && (
+
+                            <p className="store-request-error">
+                                {requestError}
+                            </p>
+
+                        )}
+
                     </div>
 
                 </div>
@@ -319,7 +540,9 @@ function MedicalStoreDetails() {
                     </div>
 
 
-                    {/* NO DOCTORS */}
+                    {/* ==========================================
+                        NO DOCTORS
+                    ========================================== */}
 
                     {doctorList.length === 0 && (
 
@@ -343,7 +566,9 @@ function MedicalStoreDetails() {
                     )}
 
 
-                    {/* DOCTOR LIST */}
+                    {/* ==========================================
+                        DOCTOR LIST
+                    ========================================== */}
 
                     {doctorList.length > 0 && (
 
@@ -371,8 +596,12 @@ function MedicalStoreDetails() {
                                                 {doctor.imageUrl ? (
 
                                                     <img
-                                                        src={doctor.imageUrl}
-                                                        alt={doctor.name}
+                                                        src={
+                                                            doctor.imageUrl
+                                                        }
+                                                        alt={
+                                                            doctor.name
+                                                        }
                                                     />
 
                                                 ) : (
@@ -434,17 +663,25 @@ function MedicalStoreDetails() {
 
                                                         <div
                                                             className="schedule-row"
-                                                            key={schedule.id}
+                                                            key={
+                                                                schedule.id
+                                                            }
                                                         >
 
                                                             <strong>
-                                                                {schedule.dayOfWeek}
+                                                                {
+                                                                    schedule.dayOfWeek
+                                                                }
                                                             </strong>
 
                                                             <span>
-                                                                {schedule.startTime}
+                                                                {
+                                                                    schedule.startTime
+                                                                }
                                                                 {" - "}
-                                                                {schedule.endTime}
+                                                                {
+                                                                    schedule.endTime
+                                                                }
                                                             </span>
 
                                                         </div>
@@ -472,9 +709,11 @@ function MedicalStoreDetails() {
                                                 )
                                             }
                                         >
+
                                             {schedules.length === 0
                                                 ? "Schedule Not Available"
                                                 : "Book Appointment"}
+
                                         </button>
 
                                     </div>

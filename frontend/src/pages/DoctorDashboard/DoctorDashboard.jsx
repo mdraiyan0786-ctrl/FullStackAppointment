@@ -26,6 +26,15 @@ function DoctorDashboard() {
 
 
     // ==========================================
+    // DOCTOR NOTIFICATIONS
+    // ==========================================
+
+    const [notifications, setNotifications] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [showNotifications, setShowNotifications] = useState(false);
+
+
+    // ==========================================
     // FETCH DOCTOR APPOINTMENTS
     // ==========================================
 
@@ -147,6 +156,161 @@ function DoctorDashboard() {
         fetchReviews();
 
     }, [navigate]);
+
+
+    // ==========================================
+    // FETCH DOCTOR NOTIFICATIONS
+    // ==========================================
+
+    const fetchNotifications = async () => {
+
+        try {
+
+            const response =
+                await api.get(
+                    "/doctor-notifications/my"
+                );
+
+            setNotifications(
+                Array.isArray(response.data)
+                    ? response.data
+                    : []
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Failed to load doctor notifications:",
+                error
+            );
+
+        }
+    };
+
+
+    // ==========================================
+    // FETCH UNREAD NOTIFICATION COUNT
+    // ==========================================
+
+    const fetchUnreadCount = async () => {
+
+        try {
+
+            const response =
+                await api.get(
+                    "/doctor-notifications/unread-count"
+                );
+
+            setUnreadCount(
+                Number(response.data) || 0
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Failed to load notification count:",
+                error
+            );
+
+        }
+    };
+
+
+    // ==========================================
+    // LOAD NOTIFICATIONS
+    // ==========================================
+
+    useEffect(() => {
+
+        fetchNotifications();
+        fetchUnreadCount();
+
+    }, []);
+
+
+    // ==========================================
+    // AUTO REFRESH NOTIFICATION COUNT
+    // ==========================================
+
+    useEffect(() => {
+
+        const interval =
+            setInterval(() => {
+
+                fetchUnreadCount();
+
+                if (showNotifications) {
+
+                    fetchNotifications();
+
+                }
+
+            }, 30000);
+
+        return () => clearInterval(interval);
+
+    }, [showNotifications]);
+
+
+    // ==========================================
+    // MARK NOTIFICATION AS READ
+    // ==========================================
+
+    const markNotificationAsRead = async (
+        notificationId
+    ) => {
+
+        try {
+
+            await api.put(
+                `/doctor-notifications/${notificationId}/read`
+            );
+
+            setNotifications((previous) =>
+                previous.map((notification) =>
+                    notification.id === notificationId
+                        ? {
+                            ...notification,
+                            read: true
+                        }
+                        : notification
+                )
+            );
+
+            setUnreadCount((previous) =>
+                Math.max(0, previous - 1)
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Failed to mark notification as read:",
+                error
+            );
+
+        }
+    };
+
+
+    // ==========================================
+    // TOGGLE NOTIFICATIONS
+    // ==========================================
+
+    const toggleNotifications = async () => {
+
+        const nextState =
+            !showNotifications;
+
+        setShowNotifications(nextState);
+
+        if (nextState) {
+
+            await fetchNotifications();
+            await fetchUnreadCount();
+
+        }
+
+    };
 
 
     // ==========================================
@@ -305,6 +469,141 @@ function DoctorDashboard() {
                                 Manage your appointments,
                                 patients and reviews
                             </p>
+
+                        </div>
+
+
+                        {/* ==========================================
+                            NOTIFICATIONS
+                        ========================================== */}
+
+                        <div className="doctor-notification-wrapper">
+
+                            <button
+                                className="doctor-notification-btn"
+                                onClick={toggleNotifications}
+                                aria-label="Notifications"
+                            >
+
+                                🔔
+
+                                {unreadCount > 0 && (
+
+                                    <span className="doctor-notification-badge">
+
+                                        {unreadCount > 99
+                                            ? "99+"
+                                            : unreadCount}
+
+                                    </span>
+
+                                )}
+
+                            </button>
+
+
+                            {showNotifications && (
+
+                                <div className="doctor-notification-dropdown">
+
+                                    <div className="doctor-notification-header">
+
+                                        <h3>
+                                            Notifications
+                                        </h3>
+
+                                        {unreadCount > 0 && (
+
+                                            <span>
+                                                {unreadCount} unread
+                                            </span>
+
+                                        )}
+
+                                    </div>
+
+
+                                    {notifications.length === 0 ? (
+
+                                        <div className="no-doctor-notifications">
+
+                                            <div>
+                                                🔔
+                                            </div>
+
+                                            <p>
+                                                No notifications
+                                            </p>
+
+                                        </div>
+
+                                    ) : (
+
+                                        <div className="doctor-notification-list">
+
+                                            {notifications.map(
+                                                (notification) => (
+
+                                                    <div
+                                                        key={
+                                                            notification.id
+                                                        }
+                                                        className={
+                                                            notification.read
+                                                                ? "doctor-notification-item"
+                                                                : "doctor-notification-item unread"
+                                                        }
+                                                        onClick={() => {
+
+                                                            if (
+                                                                !notification.read
+                                                            ) {
+
+                                                                markNotificationAsRead(
+                                                                    notification.id
+                                                                );
+
+                                                            }
+
+                                                        }}
+                                                    >
+
+                                                        <div className="doctor-notification-icon">
+                                                            🔔
+                                                        </div>
+
+                                                        <div className="doctor-notification-content">
+
+                                                            <p>
+                                                                {
+                                                                    notification.message
+                                                                }
+                                                            </p>
+
+                                                            {notification.createdAt && (
+
+                                                                <small>
+                                                                    {new Date(
+                                                                        notification.createdAt
+                                                                    ).toLocaleString()}
+                                                                </small>
+
+                                                            )}
+
+                                                        </div>
+
+                                                    </div>
+
+                                                )
+                                            )}
+
+                                        </div>
+
+                                    )}
+
+                                </div>
+
+                            )}
 
                         </div>
 
@@ -643,7 +942,6 @@ function DoctorDashboard() {
                                             )}
 
                                         </div>
-
                                     )
                                 )}
 
