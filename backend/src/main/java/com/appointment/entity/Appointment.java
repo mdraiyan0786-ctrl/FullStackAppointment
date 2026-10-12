@@ -1,7 +1,7 @@
+
 package com.appointment.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -14,52 +14,40 @@ public class Appointment {
     private Long id;
 
     private String patientName;
-
     private Integer age;
-
     private String gender;
-
     private String phone;
 
     private LocalDate appointmentDate;
-
     private LocalTime appointmentTime;
-
     private String status;
 
-    // =========================
-    // PATIENT
-    // =========================
+    // Queue number for medical store appointments
+    @Column(name = "queue_number")
+    private Integer queueNumber;
 
+    // PATIENT
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    // =========================
     // DOCTOR
-    // =========================
-
     @ManyToOne
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
 
-
+    // MEDICAL STORE
     @ManyToOne
     @JoinColumn(name = "medical_store_id")
     private MedicalStore medicalStore;
 
-    // =========================
     // PRESCRIPTION
-    // =========================
-
     @Column(columnDefinition = "TEXT")
     private String prescriptionText;
 
     private String prescriptionFileUrl;
 
-    // =========================
     // GETTERS AND SETTERS
-    // =========================
 
     public Long getId() {
         return id;
@@ -125,6 +113,14 @@ public class Appointment {
         this.status = status;
     }
 
+    public Integer getQueueNumber() {
+        return queueNumber;
+    }
+
+    public void setQueueNumber(Integer queueNumber) {
+        this.queueNumber = queueNumber;
+    }
+
     public User getUser() {
         return user;
     }
@@ -141,9 +137,13 @@ public class Appointment {
         this.doctor = doctor;
     }
 
-    // =========================
-    // PRESCRIPTION GETTERS/SETTERS
-    // =========================
+    public MedicalStore getMedicalStore() {
+        return medicalStore;
+    }
+
+    public void setMedicalStore(MedicalStore medicalStore) {
+        this.medicalStore = medicalStore;
+    }
 
     public String getPrescriptionText() {
         return prescriptionText;
@@ -159,13 +159,5 @@ public class Appointment {
 
     public void setPrescriptionFileUrl(String prescriptionFileUrl) {
         this.prescriptionFileUrl = prescriptionFileUrl;
-    }
-
-    public MedicalStore getMedicalStore() {
-        return medicalStore;
-    }
-
-    public void setMedicalStore(MedicalStore medicalStore) {
-        this.medicalStore = medicalStore;
     }
 }

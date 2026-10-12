@@ -5,11 +5,7 @@ import com.appointment.entity.Doctor;
 import com.appointment.entity.DoctorStoreRequest;
 import com.appointment.entity.MedicalStore;
 import com.appointment.entity.User;
-import com.appointment.repository.AppointmentRepository;
-import com.appointment.repository.DoctorRepository;
-import com.appointment.repository.DoctorStoreRequestRepository;
-import com.appointment.repository.MedicalStoreRepository;
-import com.appointment.repository.UserRepository;
+import com.appointment.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +18,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
+import com.appointment.entity.StoreDoctorSchedule;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AppointmentService {
@@ -32,6 +30,8 @@ public class AppointmentService {
     private final NotificationService notificationService;
     private final MedicalStoreRepository medicalStoreRepository;
     private final DoctorStoreRequestRepository doctorStoreRequestRepository;
+    private final StoreDoctorScheduleRepository storeDoctorScheduleRepository;
+
 
     public AppointmentService(
             AppointmentRepository appointmentRepository,
@@ -39,197 +39,176 @@ public class AppointmentService {
             DoctorRepository doctorRepository,
             NotificationService notificationService,
             MedicalStoreRepository medicalStoreRepository,
-            DoctorStoreRequestRepository doctorStoreRequestRepository) {
+            DoctorStoreRequestRepository doctorStoreRequestRepository,
+            StoreDoctorScheduleRepository storeDoctorScheduleRepository) {
 
         this.appointmentRepository = appointmentRepository;
         this.userRepository = userRepository;
         this.doctorRepository = doctorRepository;
         this.notificationService = notificationService;
         this.medicalStoreRepository = medicalStoreRepository;
-        this.doctorStoreRequestRepository =
-                doctorStoreRequestRepository;
+        this.doctorStoreRequestRepository = doctorStoreRequestRepository;
+        this.storeDoctorScheduleRepository = storeDoctorScheduleRepository;
     }
+
 
 
     // ==========================================
     // BOOK APPOINTMENT
     // ==========================================
 
-    public Appointment bookAppointment(
-            Appointment appointment,
-            String email) {
 
-        User user =
-                userRepository.findByEmail(email)
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "User not found"
-                                ));
+    @Transactional
+    public Appointment bookAppointment(Appointment appointment, String email) {
 
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // ==========================================
-        // CHECK DOCTOR
-        // ==========================================
-
-        if (appointment.getDoctor() == null ||
-                appointment.getDoctor().getId() == null) {
-
-            throw new RuntimeException(
-                    "Doctor is required"
-            );
+        // Validate doctor
+        if (appointment.getDoctor() == null
+                || appointment.getDoctor().getId() == null) {
+            throw new RuntimeException("Doctor is required");
         }
 
+        Doctor doctor = doctorRepository.findById(
+                        appointment.getDoctor().getId())
+                .orElseThrow(() ->
+                        new RuntimeException("Doctor not found"));
 
-        Doctor doctor =
-                doctorRepository.findById(
-                                appointment.getDoctor().getId()
-                        )
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Doctor not found"
-                                ));
-
-
-        // ==========================================
-        // MEDICAL STORE
-        // ==========================================
+        // Validate appointment date
+        if (appointment.getAppointmentDate() == null) {
+            throw new RuntimeException("Appointment date is required");
+        }
 
         MedicalStore medicalStore = null;
 
+        // Store-specific booking details
+        if (appointment.getMedicalStore() != null
+                && appointment.getMedicalStore().getId() != null) {
 
-        if (appointment.getMedicalStore() != null &&
-                appointment.getMedicalStore().getId() != null) {
+            Long storeId = appointment.getMedicalStore().getId();
 
-            Long storeId =
-                    appointment.getMedicalStore().getId();
+            medicalStore = medicalStoreRepository.findById(storeId)
+                    .orElseThrow(() ->
+                            new RuntimeException("Medical store not found"));
 
-
-            // ==========================================
-            // FIND MEDICAL STORE
-            // ==========================================
-
-            medicalStore =
-                    medicalStoreRepository
-                            .findById(storeId)
-                            .orElseThrow(() ->
-                                    new RuntimeException(
-                                            "Medical store not found"
-                                    ));
-
-
-            // ==========================================
-            // CHECK DOCTOR-STORE REQUEST
-            // ==========================================
-
+            // Verify doctor-store association
             DoctorStoreRequest request =
                     doctorStoreRequestRepository
                             .findByDoctorIdAndMedicalStoreId(
                                     doctor.getId(),
-                                    medicalStore.getId()
-                            )
+                                    medicalStore.getId())
                             .orElseThrow(() ->
                                     new RuntimeException(
-                                            "This doctor is not associated with this medical store"
-                                    ));
+                                            "This doctor is not associated with this medical store"));
 
-
-            // ==========================================
-            // CHECK APPROVAL
-            // ==========================================
-
-            if (!"APPROVED".equalsIgnoreCase(
-                    request.getStatus())) {
-
+            if (!"APPROVED".equalsIgnoreCase(request.getStatus())) {
                 throw new RuntimeException(
-                        "This doctor is not approved to work at this medical store"
-                );
+                        "This doctor is not approved to work at this medical store");
             }
+
+            // Find the session for the selected day.
+            // The repository query should lock this schedule row.
+            StoreDoctorSchedule schedule =
+                    storeDoctorScheduleRepository.findScheduleForBooking(
+                                    storeId,
+                                    doctor.getId(),
+                                    appointment.getAppointmentDate().getDayOfWeek())
+                            .orElseThrow(() ->
+                                    new RuntimeException(
+                                            "This doctor has no session scheduled at this store on that day"));
+
+            // Check session capacity.
+            // This count must include BOOKED, COMPLETED and ABSENT
+            // appointments, but exclude CANCELLED appointments.
+            long occupiedPlaces =
+                    appointmentRepository.countBookedStoreAppointments(
+                            storeId,
+                            doctor.getId(),
+                            appointment.getAppointmentDate());
+
+            if (occupiedPlaces >= schedule.getMaxPatients()) {
+                throw new RuntimeException(
+                        "This session is full. Please choose another date.");
+            }
+
+            // Assign the next queue number.
+            Integer lastQueueNumber =
+                    appointmentRepository.findMaxQueueNumber(
+                            storeId,
+                            doctor.getId(),
+                            appointment.getAppointmentDate());
+
+            appointment.setQueueNumber(
+                    (lastQueueNumber == null ? 0 : lastQueueNumber) + 1);
+
+            // Store bookings use the session's start time.
+            // Patients do not select individual appointment times.
+            appointment.setAppointmentTime(schedule.getStartTime());
+
+        } else {
+            // Normal doctor appointments remain unchanged.
+            appointment.setQueueNumber(null);
         }
 
-
-        // ==========================================
-        // CHECK DUPLICATE BOOKING
-        // ==========================================
-
+        // Preserve the existing duplicate-booking restriction.
         boolean alreadyBooked =
                 appointmentRepository
                         .existsByUserIdAndDoctorIdAndAppointmentDateAndStatus(
                                 user.getId(),
                                 doctor.getId(),
                                 appointment.getAppointmentDate(),
-                                "BOOKED"
-                        );
+                                "BOOKED");
 
         if (alreadyBooked) {
-
             throw new RuntimeException(
-                    "You have already booked an appointment with this doctor on this day."
-            );
+                    "You have already booked an appointment with this doctor on this day.");
         }
 
-
-        // ==========================================
-        // SET APPOINTMENT DETAILS
-        // ==========================================
-
+        // Set appointment details
         appointment.setUser(user);
         appointment.setDoctor(doctor);
         appointment.setMedicalStore(medicalStore);
         appointment.setStatus("BOOKED");
 
-
-        // ==========================================
-        // SAVE APPOINTMENT
-        // ==========================================
-
+        // Save appointment
         Appointment savedAppointment =
-                appointmentRepository.save(
-                        appointment
-                );
+                appointmentRepository.save(appointment);
 
-
-        // ==========================================
-        // NOTIFY MEDICAL STORE ADMIN
-        // ==========================================
-
-        if (medicalStore != null &&
-                medicalStore.getAdmin() != null) {
-
+        // Notify medical store admin
+        if (medicalStore != null && medicalStore.getAdmin() != null) {
             notificationService.createNotification(
                     medicalStore.getAdmin(),
                     "New appointment booked at "
                             + medicalStore.getName()
-                            + ". Patient: "
-                            + appointment.getPatientName()
-                            + ", Phone: "
-                            + appointment.getPhone()
-                            + ", Doctor: "
-                            + doctor.getName()
-                            + ", Date: "
-                            + appointment.getAppointmentDate()
-                            + ", Time: "
-                            + appointment.getAppointmentTime()
+                            + ". Patient: " + appointment.getPatientName()
+                            + ", Phone: " + appointment.getPhone()
+                            + ", Doctor: " + doctor.getName()
+                            + ", Date: " + appointment.getAppointmentDate()
+                            + ", Queue number: " + appointment.getQueueNumber()
             );
         }
 
-
-        // ==========================================
-        // NOTIFY PATIENT
-        // ==========================================
-
-        notificationService.createNotification(
-                user,
-                "Your appointment with "
-                        + doctor.getName()
+        // Notify patient
+        String patientMessage =
+                "Your appointment with " + doctor.getName()
                         + " has been booked successfully for "
-                        + appointment.getAppointmentDate()
-                        + " at "
-                        + appointment.getAppointmentTime()
-        );
+                        + appointment.getAppointmentDate();
 
+        if (medicalStore != null) {
+            patientMessage += ". Your queue number is "
+                    + appointment.getQueueNumber()
+                    + ". Session starts at "
+                    + appointment.getAppointmentTime();
+        } else {
+            patientMessage += " at " + appointment.getAppointmentTime();
+        }
+
+        notificationService.createNotification(user, patientMessage);
 
         return savedAppointment;
     }
+
 
     // ==========================================
     // GET ALL APPOINTMENTS

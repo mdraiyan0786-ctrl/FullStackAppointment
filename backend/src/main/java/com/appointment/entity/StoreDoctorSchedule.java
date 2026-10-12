@@ -57,6 +57,17 @@ public class StoreDoctorSchedule {
     private LocalTime endTime;
 
 
+    @Column(name = "queue_number")
+    private Integer queueNumber;
+
+
+
+
+    @Column(nullable = false)
+    private Integer maxPatients;
+
+
+
     // ==========================================
     // CONSTRUCTORS
     // ==========================================
@@ -138,4 +149,22 @@ public class StoreDoctorSchedule {
     public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
     }
+
+
+    public Integer getMaxPatients() {
+        return maxPatients;
+    }
+
+    public void setMaxPatients(Integer maxPatients) {
+        this.maxPatients = maxPatients;
+    }
+
+    public Integer getQueueNumber() {
+        return queueNumber;
+    }
+
+    public void setQueueNumber(Integer queueNumber) {
+        this.queueNumber = queueNumber;
+    }
+
 }
